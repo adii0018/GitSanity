@@ -14,14 +14,133 @@
   "activationEvents": [
     "onStartupFinished"
   ],
+  "capabilities": {
+    "untrustedWorkspaces": {
+      "supported": "limited",
+      "description": "Git repository operations, pre-commit hook management, and GitHub publishing are disabled in untrusted workspaces. Live file checking remains active."
+    }
+  },
   "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "gitsanity.menu",
+        "title": "GitSanity: Show Menu",
+        "category": "GitSanity"
+      },
+      {
+        "command": "gitsanity.safeCommit",
+        "title": "GitSanity: Safe Commit",
+        "category": "GitSanity"
+      },
+      {
+        "command": "gitsanity.undoLastCommit",
+        "title": "GitSanity: Undo Last Commit",
+        "category": "GitSanity"
+      },
+      {
+        "command": "gitsanity.scanProject",
+        "title": "GitSanity: Scan Project",
+        "category": "GitSanity"
+      },
+      {
+        "command": "gitsanity.clearProjectScan",
+        "title": "GitSanity: Clear Project Scan Issues",
+        "category": "GitSanity"
+      },
+      {
+        "command": "gitsanity.showHealthReport",
+        "title": "GitSanity: Show Health Report",
+        "category": "GitSanity"
+      },
+      {
+        "command": "gitsanity.scanHistory",
+        "title": "GitSanity: Scan Git History",
+        "category": "GitSanity"
+      },
+      {
+        "command": "gitsanity.createRepository",
+        "title": "GitSanity: Create Repository",
+        "category": "GitSanity"
+      },
+      {
+        "command": "gitsanity.publishToGitHub",
+        "title": "GitSanity: Publish to GitHub",
+        "category": "GitSanity"
+      },
+      {
+        "command": "gitsanity.installHook",
+        "title": "GitSanity: Install Git Hook",
+        "category": "GitSanity"
+      },
+      {
+        "command": "gitsanity.uninstallHook",
+        "title": "GitSanity: Uninstall Git Hook",
+        "category": "GitSanity"
+      },
+      {
+        "command": "gitsanity.createConfig",
+        "title": "GitSanity: Create Config File",
+        "category": "GitSanity"
+      },
+      {
+        "command": "gitsanity.rescanOpenFiles",
+        "title": "GitSanity: Rescan Open Files",
+        "category": "GitSanity"
+      },
+      {
+        "command": "gitsanity.moveSecretToEnv",
+        "title": "GitSanity: Move Secret to .env",
+        "category": "GitSanity"
+      },
+      {
+        "command": "gitsanity.moveAllSecretsInFile",
+        "title": "GitSanity: Move All Secrets in This File to .env",
+        "category": "GitSanity"
+      },
+      {
+        "command": "gitsanity.addEnvToGitignore",
+        "title": "GitSanity: Add .env to .gitignore",
+        "category": "GitSanity"
+      }
+    ],
+    "configuration": {
+      "title": "GitSanity",
+      "properties": {
+        "gitsanity.promptOnOpen": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show suggestion prompt when opening a folder without Git or offering a whole-project scan."
+        },
+        "gitsanity.warnOnMainBranch": {
+          "type": "boolean",
+          "default": true,
+          "description": "Warn when attempting to commit directly to main or master branches."
+        },
+        "gitsanity.historyMaxCommits": {
+          "type": "number",
+          "default": 500,
+          "description": "Maximum number of commits to inspect during git history scan."
+        }
+      }
+    },
+    "jsonValidation": [
+      {
+        "fileMatch": ".gitsanity.json",
+        "url": "./schemas/gitsanity.schema.json"
+      }
+    ]
+  },
   "scripts": {
-    "compile": "tsc -p ./",
-    "watch": "tsc -watch -p ./"
+    "compile": "tsc -p ./ && npm run build:hook",
+    "build:hook": "esbuild src/hook/preCommit.ts --bundle --platform=node --target=node16 --outfile=out/hook/pre-commit.bundle.js",
+    "watch": "tsc -watch -p ./",
+    "test": "npm run compile && node scripts/runTests.js"
   },
   "devDependencies": {
     "@types/node": "^20.11.0",
     "@types/vscode": "^1.80.0",
+    "esbuild": "^0.25.0",
     "typescript": "^5.3.3"
   }
 }

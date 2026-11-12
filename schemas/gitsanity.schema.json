@@ -1,0 +1,108 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "GitSanity Configuration",
+  "description": "Configuration schema for GitSanity (.gitsanity.json)",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "JSON schema reference URL"
+    },
+    "rules": {
+      "type": "object",
+      "description": "Rule severity configurations ('off', 'warn', 'error')",
+      "properties": {
+        "console-log": {
+          "type": "string",
+          "enum": ["off", "warn", "error"],
+          "default": "warn",
+          "description": "Flags console.log statements before commit"
+        },
+        "debugger": {
+          "type": "string",
+          "enum": ["off", "warn", "error"],
+          "default": "error",
+          "description": "Flags debugger breakpoints"
+        },
+        "conflict-marker": {
+          "type": "string",
+          "enum": ["off", "warn", "error"],
+          "default": "error",
+          "description": "Flags merge conflict markers (<<<<<<<, =======, >>>>>>>)"
+        },
+        "secret": {
+          "type": "string",
+          "enum": ["off", "warn", "error"],
+          "default": "error",
+          "description": "Flags leaked credentials and hardcoded secrets"
+        },
+        "high-entropy-string": {
+          "type": "string",
+          "enum": ["off", "warn", "error"],
+          "default": "warn",
+          "description": "Flags high-entropy string tokens that may be API keys or tokens"
+        }
+      },
+      "additionalProperties": false
+    },
+    "ignorePaths": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": [],
+      "description": "List of relative path glob patterns to ignore from GitSanity scanning"
+    },
+    "maxFileSizeMB": {
+      "type": "number",
+      "minimum": 0.1,
+      "default": 1,
+      "description": "Maximum file size in megabytes to scan"
+    },
+    "entropyThreshold": {
+      "type": "number",
+      "minimum": 0,
+      "default": 4.5,
+      "description": "Minimum Shannon entropy score to flag as high-entropy string"
+    },
+    "entropyMinLength": {
+      "type": "integer",
+      "minimum": 1,
+      "default": 20,
+      "description": "Minimum token length required for Shannon entropy evaluation"
+    },
+    "envFile": {
+      "type": "string",
+      "default": ".env",
+      "description": "Target environment variables file (relative to workspace root)"
+    },
+    "envExampleFile": {
+      "type": "string",
+      "default": ".env.example",
+      "description": "Target environment variables example file (relative to workspace root)"
+    },
+    "createEnvExample": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether to also populate the .env.example file when moving secrets to .env"
+    },
+    "largeFileMB": {
+      "type": "number",
+      "minimum": 0.1,
+      "default": 5,
+      "description": "Threshold in megabytes to flag tracked or staged files as large"
+    },
+    "maxProjectFiles": {
+      "type": "integer",
+      "minimum": 1,
+      "default": 20000,
+      "description": "Maximum number of files to scan during a whole project scan"
+    },
+    "blockOnWarnings": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether the pre-commit hook blocks commits when warning-severity issues are found"
+    }
+  },
+  "additionalProperties": true
+}

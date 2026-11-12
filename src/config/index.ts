@@ -1,4 +1,3 @@
-// Placeholder for GitSanity configuration (reserved for future phases)
-export interface GitSanityConfig {
-  enabled?: boolean;
-}
+export * from './configSchema';
+export * from './configLoader';
+export * from './pathMatcher';

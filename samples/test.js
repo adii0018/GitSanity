@@ -1,34 +1,67 @@
 // =============================================================================
-// GitSanity Test File (Phase 1)
-// Contains examples of every detection rule and false-positive guards.
+// GitSanity Test File (JavaScript)
 // =============================================================================
 
-// Rule: console-log (Severity: Warning, Quick Fix available)
+// --- Phase 1: Core Rules ---
+
+// 1. console-log (Severity: Warning, Quick Fix available)
 console.log("Debugging user session");
 
-// Rule: stray debugging breakpoint (Severity: Error)
+// 2. Stray breakpoint (Severity: Error)
 debugger;
 
-// Rule: AWS Access Key (Severity: Error)
+// 3. AWS Access Key assigned to variable (Movable to .env)
 const awsAccessKey = "AKIAIOSFODNN7EXAMPLE";
 
-// Rule: Generic Secret Assignment (Severity: Error)
+// 4. Hardcoded apiKey assignment (Movable to .env)
 const apiKey = "secret_token_1234567890abcdef";
-const userPassword = "superSecurePassword9876_secret";
 
-// Rule: Hex Secret in Assignment (32+ hex chars, Severity: Error)
+// 5. Hex Secret in Assignment (32+ hex chars, Movable to .env)
 const token = "4f53c89b33a5b3a4f53c89b33a5b3a4f4f53c89b33a5b3a4f53c89b33a5b3a4f";
-const unquotedHexPassword = 4f53c89b33a5b3a4f53c89b33a5b3a4f;
 
-// False-positive guard 1: Bare Hex Hash / Git Commit SHA (SAFE: Must NOT be flagged)
+// --- Phase 2: Entropy Detection & Ignore Directives ---
+
+// 6. High-Entropy String (Movable to .env)
+const payload = "q8Zr3KfX2mVn9LpA7sTyWb4Hc1Jd";
+
+// 7. Same-line ignore directive (SAFE: rule ignored on this line)
+console.log("Allowed console log"); // gitsanity-ignore console-log
+
+// 8. Next-line ignore directive (SAFE: next line ignored)
+// gitsanity-ignore-next-line debugger
+debugger;
+
+// --- Phase 3: Auto-Fix Edge Cases (NO Move to .env expected) ---
+
+// 9. Bearer string: secret is only PART of larger string (NO .env fix offered)
+const authHeader = "Bearer AKIAIOSFODNN7EXAMPLE";
+
+// 10. Template literal containing ${}: (NO .env fix offered)
+const userId = "user123";
+const dynamicSecret = `token_${userId}_1234567890abcdef`;
+
+// --- False-Positive Guards (SAFE: NONE of these should be flagged) ---
+
+// Guard 1: Bare Hex Hash / Git Commit SHA
 const gitCommitSha = "4f53c89b33a5b3a4f53c89b33a5b3a4f4f53c89b";
 
-// False-positive guard 2: Non-conflict separator (SAFE: 5 equals signs, Must NOT be flagged)
+// Guard 2: Non-conflict separator (5 equals signs)
 // ===== Safe Section Heading =====
 
-// Rule: Merge Conflict Markers (Severity: Error)
+// Guard 3: UUID string
+const recordId = "123e4567-e89b-12d3-a456-426614174000";
+
+// Guard 4: URL endpoint
+const apiEndpoint = "https://example.com/api/v1/auth/callback/token";
+
+// Guard 5: Long camelCase identifier string
+const label = "thisIsJustALongCamelCaseName";
+
+// --- Conflict Markers ---
+
+// 11. Merge Conflict Markers (Severity: Error)
 <<<<<<< HEAD
-const activeBranch = "feature/phase-1";
+const activeBranch = "feature/phase-3";
 =======
 const activeBranch = "main";
 >>>>>>> main
