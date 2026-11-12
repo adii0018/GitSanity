@@ -202,6 +202,11 @@ export async function scanHistoryCommand(
   configLoader: ConfigLoader,
   targetFolder?: vscode.WorkspaceFolder
 ): Promise<void> {
+  if (!vscode.workspace.isTrusted) {
+    vscode.window.showErrorMessage('GitSanity: Git operations and history scanning are disabled in untrusted workspaces.');
+    return;
+  }
+
   const folder = getActiveFolder(targetFolder);
   if (!folder) return;
 
@@ -377,7 +382,7 @@ export async function publishToGitHubCommand(
   // git remote add origin <clone_url>
   const remoteRes = await runGit(['remote', 'add', 'origin', createRes.cloneUrl], root);
   if (remoteRes.code !== 0) {
-    vscode.window.showErrorMessage(`GitSanity: Failed to add remote origin: ${remoteRes.stderr}`);
+    vscode.window.showErrorMessage(`GitSanity: Failed to add remote origin: ${redact(remoteRes.stderr)}`);
     return;
   }
 
