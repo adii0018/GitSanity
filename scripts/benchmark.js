@@ -39,11 +39,8 @@ async function runBenchmarks() {
   console.log('2. Benchmarking scanText on 5 MB file...');
   const lineChunk = 'const payload_data = "abcdefghijklmnopqrstuvwxyz0123456789"; // normal code line\n';
   const targetBytes = 5 * 1024 * 1024;
-  let text5MB = '';
-  while (Buffer.byteLength(text5MB, 'utf8') < targetBytes) {
-    text5MB += lineChunk;
-  }
-  text5MB += 'console.log("at end of large file");\n';
+  const chunkCount = Math.ceil(targetBytes / lineChunk.length);
+  let text5MB = lineChunk.repeat(chunkCount) + 'console.log("at end of large file");\n';
 
   const start5MB = Date.now();
   const findings5MB = scanText(text5MB);
