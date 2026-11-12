@@ -53,6 +53,11 @@ export function scanText(text: string, options?: ScanOptions): Finding[] {
     return [];
   }
 
+  // Strip leading UTF-8 BOM if present
+  if (text.charCodeAt(0) === 0xFEFF) {
+    text = text.slice(1);
+  }
+
   const lines = text.split(/\r?\n/);
 
   // 1. File-level ignore: if found in the first 10 lines, return zero findings
@@ -71,9 +76,25 @@ export function scanText(text: string, options?: ScanOptions): Finding[] {
 
   const findings: Finding[] = [];
   let pendingNextLineIgnores: (Set<RuleId> | 'all')[] = [];
+  let inConflictBlock = false;
+  const MAX_LINE_SCAN_LENGTH = 5000;
 
   for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
-    const line = lines[lineIndex];
+    const rawLine = lines[lineIndex];
+    const prevLine = lineIndex > 0 ? lines[lineIndex - 1] : undefined;
+
+    // Cap line length to prevent ReDoS on massive/minified lines
+    const line = rawLine.length > MAX_LINE_SCAN_LENGTH ? rawLine.slice(0, MAX_LINE_SCAN_LENGTH) : rawLine;
+
+    // Track merge conflict block
+    if (/^<{7}(\s.*)?$/.test(line)) {
+      inConflictBlock = true;
+    }
+
+    const context: LineContext = {
+      inConflictBlock,
+      prevLine
+    };
 
     // Ignores active for this line (from previous next-line directives)
     const activeIgnoresForLine = [...pendingNextLineIgnores];
@@ -138,7 +159,7 @@ export function scanText(text: string, options?: ScanOptions): Finding[] {
       }
 
       const severity: Severity = setting === 'error' ? 'error' : 'warning';
-      const rawRuleFindings = rule.checkLine(line, lineIndex, severity);
+      const rawRuleFindings = rule.checkLine(line, lineIndex, severity, context);
       const ruleFindings = rawRuleFindings.filter(f => !isInsideDirective(f));
 
       if (rule.id === 'secret' && ruleFindings.length > 0) {
@@ -146,6 +167,10 @@ export function scanText(text: string, options?: ScanOptions): Finding[] {
       }
 
       findings.push(...ruleFindings);
+    }
+
+    if (/^>{7}(\s.*)?$/.test(line)) {
+      inConflictBlock = false;
     }
 
     // Check high-entropy-string rule (only if line was not already flagged by secret)
