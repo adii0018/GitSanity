@@ -194,3 +194,42 @@ export function scanText(text: string, options?: ScanOptions): Finding[] {
 
   return uniqueFindings;
 }
+
+/**
+ * Checks whether a given line is ignored for a specific ruleId via file-level or inline directives.
+ */
+export function isLineIgnoredForRule(lines: string[], lineIndex: number, ruleId: RuleId): boolean {
+  if (lines.slice(0, 10).some((l) => /\bgitsanity-ignore-file\b/.test(l))) {
+    return true;
+  }
+
+  // Check previous line for ignore-next-line
+  if (lineIndex > 0) {
+    const prevLine = lines[lineIndex - 1];
+    const nextLineMatch = prevLine.match(/\bgitsanity-ignore-next-line(?:\s+([^\r\n]*))?/);
+    if (nextLineMatch) {
+      const parsed = parseIgnoreRules(nextLineMatch[1]);
+      if (parsed === 'all' || parsed.has(ruleId)) {
+        return true;
+      }
+    }
+  }
+
+  // Check current line for ignore
+  if (lineIndex >= 0 && lineIndex < lines.length) {
+    const currLine = lines[lineIndex];
+    const sameLineMatch = currLine.match(/\bgitsanity-ignore(?:\s+([^\r\n]*))?/);
+    if (
+      sameLineMatch &&
+      !/\bgitsanity-ignore-next-line\b/.test(currLine) &&
+      !/\bgitsanity-ignore-file\b/.test(currLine)
+    ) {
+      const parsed = parseIgnoreRules(sameLineMatch[1]);
+      if (parsed === 'all' || parsed.has(ruleId)) {
+        return true;
+      }
+    }
+  }
+
+  return false;
+}

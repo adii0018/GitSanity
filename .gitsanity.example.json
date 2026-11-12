@@ -5,7 +5,8 @@
     "debugger": "error",
     "conflict-marker": "error",
     "secret": "error",
-    "high-entropy-string": "warn"
+    "high-entropy-string": "warn",
+    "old-todo": "off"
   },
   "ignorePaths": [
     "tests/",
@@ -20,5 +21,6 @@
   "createEnvExample": true,
   "largeFileMB": 5,
   "maxProjectFiles": 20000,
-  "blockOnWarnings": false
+  "blockOnWarnings": false,
+  "todoMaxAgeDays": 90
 }

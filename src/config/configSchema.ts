@@ -3,7 +3,8 @@ export type RuleId =
   | 'debugger'
   | 'conflict-marker'
   | 'secret'
-  | 'high-entropy-string';
+  | 'high-entropy-string'
+  | 'old-todo';
 
 export type RuleSeverity = 'off' | 'warn' | 'error';
 
@@ -19,6 +20,7 @@ export interface GitSanityConfig {
   largeFileMB: number;
   maxProjectFiles: number;
   blockOnWarnings: boolean;
+  todoMaxAgeDays: number;
 }
 
 export const KNOWN_RULE_IDS: readonly RuleId[] = [
@@ -26,7 +28,8 @@ export const KNOWN_RULE_IDS: readonly RuleId[] = [
   'debugger',
   'conflict-marker',
   'secret',
-  'high-entropy-string'
+  'high-entropy-string',
+  'old-todo'
 ] as const;
 
 export const DEFAULT_CONFIG: GitSanityConfig = {
@@ -35,7 +38,8 @@ export const DEFAULT_CONFIG: GitSanityConfig = {
     'debugger': 'error',
     'conflict-marker': 'error',
     'secret': 'error',
-    'high-entropy-string': 'warn'
+    'high-entropy-string': 'warn',
+    'old-todo': 'off'
   },
   ignorePaths: [],
   maxFileSizeMB: 1,
@@ -46,7 +50,8 @@ export const DEFAULT_CONFIG: GitSanityConfig = {
   createEnvExample: true,
   largeFileMB: 5,
   maxProjectFiles: 20000,
-  blockOnWarnings: false
+  blockOnWarnings: false,
+  todoMaxAgeDays: 90
 };
 
 function isValidRelativePath(p: unknown): boolean {
@@ -227,6 +232,15 @@ export function parseConfig(jsonText: string): { config: GitSanityConfig; errors
       errors.push('Property "blockOnWarnings" must be a boolean.');
     } else {
       config.blockOnWarnings = raw.blockOnWarnings;
+    }
+  }
+
+  // 12. Validate 'todoMaxAgeDays'
+  if ('todoMaxAgeDays' in raw) {
+    if (typeof raw.todoMaxAgeDays !== 'number' || Number.isNaN(raw.todoMaxAgeDays) || raw.todoMaxAgeDays < 1) {
+      errors.push('Property "todoMaxAgeDays" must be a number >= 1.');
+    } else {
+      config.todoMaxAgeDays = raw.todoMaxAgeDays;
     }
   }
 

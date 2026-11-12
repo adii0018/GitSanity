@@ -41,6 +41,12 @@
           "enum": ["off", "warn", "error"],
           "default": "warn",
           "description": "Flags high-entropy string tokens that may be API keys or tokens"
+        },
+        "old-todo": {
+          "type": "string",
+          "enum": ["off", "warn", "error"],
+          "default": "off",
+          "description": "Flags TODO/FIXME/HACK/XXX comments older than todoMaxAgeDays"
         }
       },
       "additionalProperties": false
@@ -102,6 +108,12 @@
       "type": "boolean",
       "default": false,
       "description": "Whether the pre-commit hook blocks commits when warning-severity issues are found"
+    },
+    "todoMaxAgeDays": {
+      "type": "number",
+      "minimum": 1,
+      "default": 90,
+      "description": "Maximum age in days before a TODO comment is flagged by the old-todo rule"
     }
   },
   "additionalProperties": true

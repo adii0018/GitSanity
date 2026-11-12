@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import { scanProject, ProjectScanResult } from '../scanner/projectScanner';
 import { ConfigLoader } from '../config/configLoader';
+import { setSessionProjectScanSummary } from '../ui/dashboard';
 
 export let lastProjectScanResult: { folder: vscode.WorkspaceFolder; result: ProjectScanResult } | undefined;
 
@@ -48,6 +49,19 @@ export async function scanProjectCommand(
       });
 
       lastProjectScanResult = { folder, result: scanResult };
+
+      const summaryList = Array.from(scanResult.byFile.entries())
+        .map(([file, findings]) => {
+          let errs = 0;
+          let warns = 0;
+          for (const f of findings) {
+            if (f.severity === 'error') errs++;
+            else warns++;
+          }
+          return { file, errors: errs, warnings: warns, total: errs + warns };
+        })
+        .sort((a, b) => b.total - a.total);
+      setSessionProjectScanSummary(summaryList);
 
       // Publish findings to separate DiagnosticCollection "gitsanity-project" (cap 5000)
       projectDiagnostics.clear();
