@@ -4,6 +4,10 @@ import { detectRepoState } from '../git/repoDetector';
 const sessionCheckedFolders = new Set<string>();
 
 export async function checkRepoPromptsOnOpen(context: vscode.ExtensionContext): Promise<void> {
+  if (!vscode.workspace.isTrusted) {
+    return;
+  }
+
   const folders = vscode.workspace.workspaceFolders || [];
   if (folders.length === 0) {
     return;
