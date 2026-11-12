@@ -1,6 +1,6 @@
 export type RuleId =
   | 'console-log'
-  | 'debugger'
+  | 'debugger' // gitsanity-ignore debugger
   | 'conflict-marker'
   | 'secret'
   | 'high-entropy-string'
@@ -25,7 +25,7 @@ export interface GitSanityConfig {
 
 export const KNOWN_RULE_IDS: readonly RuleId[] = [
   'console-log',
-  'debugger',
+  'debugger', // gitsanity-ignore debugger
   'conflict-marker',
   'secret',
   'high-entropy-string',
@@ -35,7 +35,7 @@ export const KNOWN_RULE_IDS: readonly RuleId[] = [
 export const DEFAULT_CONFIG: GitSanityConfig = {
   rules: {
     'console-log': 'warn',
-    'debugger': 'error',
+    'debugger': 'error', // gitsanity-ignore debugger
     'conflict-marker': 'error',
     'secret': 'error',
     'high-entropy-string': 'warn',
@@ -86,7 +86,8 @@ export function parseConfig(jsonText: string): { config: GitSanityConfig; errors
     createEnvExample: DEFAULT_CONFIG.createEnvExample,
     largeFileMB: DEFAULT_CONFIG.largeFileMB,
     maxProjectFiles: DEFAULT_CONFIG.maxProjectFiles,
-    blockOnWarnings: DEFAULT_CONFIG.blockOnWarnings
+    blockOnWarnings: DEFAULT_CONFIG.blockOnWarnings,
+    todoMaxAgeDays: DEFAULT_CONFIG.todoMaxAgeDays
   };
 
   let parsed: unknown;

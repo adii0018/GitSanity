@@ -5,6 +5,7 @@ export interface RunGitOptions {
   timeoutMs?: number;
   input?: string;
   maxBuffer?: number;
+  signal?: AbortSignal;
 }
 
 export interface RunGitResult {
@@ -37,7 +38,8 @@ export function runGit(
         timeout,
         maxBuffer,
         windowsHide: true,
-        encoding: 'utf8'
+        encoding: 'utf8',
+        signal: opts?.signal
       },
       (error, stdout, stderr) => {
         let code = 0;

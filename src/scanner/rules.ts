@@ -28,8 +28,8 @@ export interface Rule {
 // Regex for console.log
 const CONSOLE_LOG_REGEX = /\bconsole\.log\s*\(/g;
 
-// Regex for debugger
-const DEBUGGER_REGEX = /\bdebugger\b\s*;?/g;
+// Regex for breakpoint
+const DEBUGGER_REGEX = /\bdebugger\b\s*;?/g; // gitsanity-ignore debugger
 
 // Regex for merge conflict markers (match ONLY at start of line)
 const CONFLICT_MARKER_REGEXES = [
@@ -126,14 +126,14 @@ export const consoleLogRule: Rule = {
 };
 
 export const debuggerRule: Rule = {
-  id: 'debugger',
+  id: 'debugger', // gitsanity-ignore debugger
   checkLine(line: string, lineIndex: number, severity: Severity): Finding[] {
     return runRegexOnLine(
       DEBUGGER_REGEX,
       line,
       lineIndex,
-      'debugger',
-      'debugger statement found. Remove it before committing.',
+      'debugger', // gitsanity-ignore debugger
+      'debugger statement found. Remove it before committing.', // gitsanity-ignore debugger
       severity
     );
   }

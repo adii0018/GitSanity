@@ -6,6 +6,8 @@ export interface StagedFileEntry {
   oldPath?: string;
 }
 
+export type StagedFile = StagedFileEntry;
+
 export interface StatusPorcelainResult {
   staged: { path: string; status: string }[];
   unstaged: { path: string; status: string }[];

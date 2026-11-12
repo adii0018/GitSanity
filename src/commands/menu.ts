@@ -37,6 +37,13 @@ export async function showGitSanityMenu(): Promise<void> {
   });
 
   items.push({
+    label: '$(dashboard) Show Dashboard',
+    description: 'Streak, metrics, trends and badges',
+    detail: 'View clean commit streak, weekly issue trends, top mistakes, and milestones',
+    command: 'gitsanity.showDashboard'
+  });
+
+  items.push({
     label: '$(search) Scan Project',
     description: 'Whole project scan',
     detail: 'Scan tracked and untracked files for secrets and issues',
@@ -50,6 +57,13 @@ export async function showGitSanityMenu(): Promise<void> {
     command: 'gitsanity.showHealthReport'
   });
 
+  items.push({
+    label: '$(clock) Find Old TODOs',
+    description: 'Tracked TODOs sorted by age',
+    detail: 'Inspect TODO, FIXME, HACK, XXX comments across repository files',
+    command: 'gitsanity.findOldTodos'
+  });
+
   if (state !== 'no-repo' && state !== 'no-git' && hasCommits) {
     items.push({
       label: '$(history) Scan History',
@@ -60,6 +74,13 @@ export async function showGitSanityMenu(): Promise<void> {
   }
 
   if (state !== 'no-repo' && state !== 'no-git') {
+    items.push({
+      label: '$(eye) Review Before Commit',
+      description: 'Interactive staged review panel',
+      detail: 'Check staged changes, review findings, checklists, and commit',
+      command: 'gitsanity.reviewBeforeCommit'
+    });
+
     items.push({
       label: '$(check) Safe Commit',
       description: 'Scan & Commit securely',

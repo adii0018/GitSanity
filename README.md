@@ -1,196 +1,109 @@
 # GitSanity
 
-**Scan, secure and commit safely.**
+**Scan, secure, and commit safely.**
 
-GitSanity is a VS Code extension that catches mistakes **before** they reach your Git history: leaked secrets, forgotten `console.log`, stray `debugger`, and merge conflict markers.
+GitSanity is a lightweight, zero-dependency VS Code extension that catches mistakes **before** they reach your Git history: leaked API keys, forgotten `console.log` statements, stray `debugger;` breakpoints, merge conflict markers, and stale TODOs.
+
+<!-- Screenshots
+Placeholder for marketplace preview screenshots.
+-->
 
 ---
 
-## Features
+## Quick Start (3 Steps)
 
-### Detection Rules
-- `console-log`: Flags `console.log(...)` calls before committing.
-- `debugger`: Flags `debugger;` breakpoints.
-- `conflict-marker`: Flags Git merge conflict markers (`<<<<<<<`, `=======`, `>>>>>>>`).
-- `secret`: Flags hardcoded credentials (AWS keys, generic token/password assignments, hex secrets). Bare Git commit hashes are ignored.
-- `high-entropy-string`: Detects high-entropy random strings inside quotes using Shannon entropy calculation (entropy >= 4.5 by default) while ignoring UUIDs, URLs, and camelCase identifiers.
+1. **Install GitSanity** from the VS Code Marketplace or from a local `.vsix` file.
+2. **Open any project folder**: GitSanity immediately starts scanning your open files and highlights security issues in real-time.
+3. **Protect your commits**: Run `GitSanity: Install Git Hook` from the Command Palette (<kbd>Ctrl+Shift+P</kbd> / <kbd>Cmd+Shift+P</kbd>) to prevent accidental secret leaks across terminal commands and editor commits.
+
+---
+
+## Features at a Glance
+
+| Feature | Description | Command |
+|---|---|---|
+| **Live Editor Scanning** | Real-time diagnostics for secrets, logs, breakpoints, and conflict markers. | `GitSanity: Rescan Open Files` |
+| **Move Secrets to `.env`** | One-click Quick Fix migrating hardcoded credentials to `.env`. | `GitSanity: Move Secret to .env` |
+| **Review Before Commit** | Interactive pre-commit review panel with checklists and branch warnings. | `GitSanity: Review Before Commit` |
+| **Safe Commit** | Pre-flight index scan with automated Conventional Commit message generation. | `GitSanity: Safe Commit` |
+| **Undo Last Commit** | Safe soft-reset (`HEAD~1`) for local unpushed commits. | `GitSanity: Undo Last Commit` |
+| **Pre-Commit Hook** | Bundled Node.js hook inspecting staged files directly from Git index. | `GitSanity: Install Git Hook` |
+| **Repository Health Report** | Webview report assessing repository security hygiene and setup. | `GitSanity: Show Health Report` |
+| **Analytics Dashboard** | Clean commit streak, milestone badges, and 8-week issue trend chart. | `GitSanity: Show Dashboard` |
+| **Old TODO Detector** | Scans Git blame history to find stale TODOs and FIXMEs. | `GitSanity: Find Old TODOs` |
+| **Git History Scanner** | Deep inspects commit history diffs for previously committed secrets. | `GitSanity: Scan Git History` |
+| **Publish to GitHub** | Creates a private or public GitHub repo via HTTPS API and pushes code. | `GitSanity: Publish to GitHub` |
+
+---
+
+## Detection Rules
+
+- `secret`: Flags AWS access keys, generic credential assignments (e.g. `api_key = "..."`, `password = "..."`), and 32+ character hex tokens.
+- `high-entropy-string`: Shannon entropy detector catching random tokens, hashes, and API keys inside quotes while ignoring UUIDs, URLs, and variable names.
+- `console-log`: Flags forgotten `console.log(...)` calls (warning).
+- `debugger`: Flags stray `debugger;` breakpoints (error).
+- `conflict-marker`: Flags Git merge conflict markers (`<<<<<<<`, `=======`, `>>>>>>>`) (error).
+- `old-todo`: Flags TODO, FIXME, HACK, and XXX comments older than a configurable threshold (default 90 days).
 
 ---
 
 ## Move Secrets to `.env` (Smart Auto-Fix)
 
-GitSanity provides a one-click Quick Fix to safely migrate hardcoded secrets to an environment file and replace the code with the language's native environment lookup.
+When GitSanity detects a hardcoded credential or high-entropy secret, click the lightbulb icon (<kbd>Ctrl+.</kbd> / <kbd>Cmd+.</kbd>) to trigger **GitSanity: Move to .env**.
 
-### How It Works
-1. **Name Extraction**: Converts the assignment identifier or key (e.g. `apiKey`, `stripe-secret`, `dbPassword`) into `UPPER_SNAKE_CASE` (e.g. `API_KEY`, `STRIPE_SECRET`, `DB_PASSWORD`). Bare AWS keys fall back to `AWS_ACCESS_KEY_ID`.
-2. **`.env` Update**: Appends `NAME=value` to `.env` (or configured `envFile`). If the variable already exists with a different value, GitSanity automatically renames it to `NAME_2`, `NAME_3`, etc.
-3. **`.env.example` Update**: Automatically ensures a placeholder `NAME=` exists in `.env.example` without values.
-4. **Code Replacement**: Replaces the literal in your source file with the appropriate environment variable expression. For Python, it automatically inserts `import os` in the correct location (after any shebang and encoding lines).
-5. **`.gitignore` Protection**: Verifies whether `.env` is ignored by `.gitignore`. If not, it adds it automatically.
-6. **Rotation Reminder**: Displays a warning reminder that removing secrets from code does not remove them from Git history if they were previously committed.
+### What It Does Automatically
+1. **Converts Variable Names**: Transforms `apiKey` or `stripe-secret` to `API_KEY` or `STRIPE_SECRET`.
+2. **Updates `.env`**: Appends the secret cleanly without overwriting existing entries. If a variable with that name already exists with a different value, GitSanity safely uses `API_KEY_2`.
+3. **Synchronizes `.env.example`**: Adds a placeholder (e.g. `API_KEY=`) to `.env.example` so teammates know what to configure.
+4. **Protects `.gitignore`**: Automatically verifies that `.env` is listed in your `.gitignore`.
+5. **Replaces Code**: Replaces the literal in your code with the appropriate language expression.
+
+### Supported Languages & Expressions
+
+| Language | Generated Expression | Note |
+|---|---|---|
+| **JavaScript / TypeScript** | `process.env.VARIABLE_NAME` | Native Node.js lookup |
+| **Python** | `os.environ["VARIABLE_NAME"]` | Automatically inserts `import os` |
+| **Ruby** | `ENV["VARIABLE_NAME"]` | Native Ruby ENV lookup |
+| **PHP** | `getenv('VARIABLE_NAME')` | Native PHP getenv |
+| **Go** | `os.Getenv("VARIABLE_NAME")` | Standard library os package |
+| **Java** | `System.getenv("VARIABLE_NAME")` | Standard Java environment lookup |
+| **C#** | `Environment.GetEnvironmentVariable("VARIABLE_NAME")` | Standard .NET environment lookup |
+| **Shell (bash/sh)** | `${VARIABLE_NAME}` | POSIX environment variable syntax |
 
 > [!WARNING]
-> **Secret Rotation Notice**: Moving a secret to `.env` keeps it out of future commits. If this secret was ever committed or pushed, rotate and revoke it immediately: removing it from working files does not erase it from Git history.
-
-### Supported Languages
-
-| Language | Generated Expression | Import / Hint |
-|---|---|---|
-| **JavaScript / TypeScript** (`.js`, `.ts`, `.jsx`, `.tsx`) | `process.env.VAR_NAME` | Load `.env` at startup (e.g. using `dotenv`) |
-| **Python** (`.py`) | `os.environ["VAR_NAME"]` | Automatically inserts `import os` |
-| **Ruby** (`.rb`) | `ENV["VAR_NAME"]` | Native `ENV` lookup |
-| **PHP** (`.php`) | `getenv('VAR_NAME')` | Native `getenv()` |
-| **Go** (`.go`) | `os.Getenv("VAR_NAME")` | Ensure `"os"` package is imported |
-| **Java** (`.java`) | `System.getenv("VAR_NAME")` | Native `System.getenv` |
-| **C#** (`.cs`) | `Environment.GetEnvironmentVariable("VAR_NAME")` | Native `Environment` |
-| **Shell** (`.sh`, `.bash`) | `${VAR_NAME}` | Source your `.env` file before running |
-
----
-
-## Configuration (`.gitsanity.json`)
-
-GitSanity supports workspace-level configuration with real-time file-watching and schema validation.
-
-```json
-{
-  "$schema": "./schemas/gitsanity.schema.json",
-  "rules": {
-    "console-log": "warn",
-    "debugger": "error",
-    "conflict-marker": "error",
-    "secret": "error",
-    "high-entropy-string": "warn"
-  },
-  "ignorePaths": [
-    "tests/",
-    "scripts/",
-    "docs/**/*.md"
-  ],
-  "maxFileSizeMB": 1,
-  "entropyThreshold": 4.5,
-  "entropyMinLength": 20,
-  "envFile": ".env",
-  "envExampleFile": ".env.example",
-  "createEnvExample": true
-}
-```
-
-- **Rule Severities**: `"off"` (disabled), `"warn"` (warning diagnostic), `"error"` (error diagnostic).
-- **Environment File Settings**:
-  - `envFile`: Destination `.env` file (default `".env"`).
-  - `envExampleFile`: Destination example file (default `".env.example"`).
-  - `createEnvExample`: Whether to keep the example file synchronized (default `true`).
-- **Default Ignores**: `node_modules/`, `.git/`, `out/`, `dist/`, `build/`, `*.min.js`, `*.map`, `package-lock.json`, `yarn.lock`, `pnpm-lock.yaml`, `*.lock`, and `.env*` files.
-
----
-
-## Inline Ignore Comments
-
-Directives work in comments across all programming languages:
-- `// gitsanity-ignore`: Ignores all findings on the current line.
-- `// gitsanity-ignore console-log, debugger`: Ignores only the listed rules on the current line.
-- `// gitsanity-ignore-next-line [rules]`: Ignores findings on the following line.
-- `// gitsanity-ignore-file`: When placed in the first 10 lines of a file, ignores all findings across the file.
-
----
-
-## Commands & Quick Fixes
-
-### Commands
-- `GitSanity: Create Config File` (`gitsanity.createConfig`): Creates a starter `.gitsanity.json` in the workspace root.
-- `GitSanity: Rescan Open Files` (`gitsanity.rescanOpenFiles`): Manually triggers a re-scan of all open files.
-- `GitSanity: Move Secret to .env` (`gitsanity.moveSecretToEnv`): Moves the selected diagnostic secret to `.env`.
-- `GitSanity: Move All Secrets in This File to .env` (`gitsanity.moveAllSecretsInFile`): Migrates all secrets in the active file in one batch with modal confirmation.
-- `GitSanity: Add .env to .gitignore` (`gitsanity.addEnvToGitignore`): Appends `.env` to the repository's `.gitignore`.
-
-### Quick Fixes
-- **Remove line**: One-click deletion of `console.log` statements.
-- **Move secret to .env**: Available on `secret` and `high-entropy-string` diagnostics for supported languages.
-- **Move all N secrets in this file to .env**: Offered when 2 or more secrets are present in the file.
-- **Ignore this line**: Appends `gitsanity-ignore <ruleId>` in the document's native comment syntax.
-- **Ignore in this file**: Inserts `gitsanity-ignore-file` at the top of the file (preserving any shebang line).
-
----
-
-## Repository Awareness & Health
-
-GitSanity monitors the active workspace's Git status and provides repository management tools.
-
-### Repository Status & Initialization
-- **Detection**: Automatically identifies repository state (`no-git`, `no-repo`, `local-repo`, `remote-repo`).
-- **Initialization**: `GitSanity: Initialize Git Repository` runs `git init -b main` (with fallback to default branch) and generates a tailored `.gitignore` based on detected project files (Node, Python, Java, Go, Rust, .NET, PHP, Ruby).
-- **On-Open Prompts**: Offers an initial prompt to initialize Git or run a project scan when opening a folder, with "Don't ask again" persistence.
-
-### Whole-Project Scanning
-- **Command**: `GitSanity: Scan Entire Project` (`gitsanity.scanProject`).
-- **Features**: Scans all tracked files (using `git ls-files` or recursive directory walk) without opening each file.
-- **Diagnostics**: Publishes results to a separate `gitsanity-project` DiagnosticCollection so clearing open-file diagnostics doesn't discard project-level results.
-- **Safety**: Automatically ignores binaries (checks first 8000 bytes for null bytes), `.env` files, files exceeding `maxFileSizeMB`, and respects `maxProjectFiles` (default 20,000) with a concurrency pool of 8.
-
-### Repository Health Report (Webview Panel)
-- **Command**: `GitSanity: Show Repository Health Report` (`gitsanity.showHealthReport`).
-- **Visual Dashboard**: Renders a custom VS Code webview panel styled with VS Code theme variables (`--vscode-*`) and strict CSP nonce security.
-- **Health Checks**:
-  1. Git initialized status.
-  2. Remote origin configured.
-  3. Pre-commit hook installed status.
-  4. `.env` file presence and whether it is safely ignored in `.gitignore`.
-  5. Whole-project issue count and severity breakdown.
-- **Interactive Actions**: Includes one-click buttons to initialize Git, install hooks, add `.env` to `.gitignore`, run scans, and launch Safe Commit.
-
-### Git History Secret Scanner
-- **Command**: `GitSanity: Scan Git History for Leaked Secrets` (`gitsanity.scanHistory`).
-- **Deep Inspection**: Streams `git log -p` commit diffs line-by-line (up to `gitsanity.historyMaxCommits`, default 500) and inspects added lines (`+`) for error-level secrets.
-- **Rotation Reminder**: If leaked secrets are discovered in past commits, GitSanity reports the offending commit hash, author, date, and sanitized line, accompanied by a rotation warning (emphasizing that rewriting history or deleting the file in a new commit does not revoke the secret).
+> **Secret Rotation Notice**: Moving a secret to `.env` prevents future leaks. If the secret was already committed or pushed to a remote repository in the past, rotate and revoke it immediately: editing working files does not remove secrets from Git history.
 
 ---
 
 ## Pre-Commit Hook & Safe Commit
 
-GitSanity ensures zero secrets or forgotten debug code escape into Git history.
+### CLI Pre-Commit Hook
+Run `GitSanity: Install Git Hook` to install GitSanity's bundled pre-commit hook into `.git/hooks/pre-commit`.
+- **Index-Based Verification**: Directly inspects staged changes in the Git index (`git show :<path>`). Modifying files in your working directory after `git add` cannot trick the hook.
+- **Blocks Dangerous Staging**: Prevents staging `.env` files and files with error-severity issues.
+- **Large File Warning**: Warns when staged files exceed `largeFileMB` (default 5 MB).
+- **Graceful Fallback**: Fails open (exit code 0) if an internal runtime error occurs, ensuring you are never blocked from emergency work.
 
-### Bundled Pre-Commit Hook
-- **Installation**: `GitSanity: Install Pre-commit Hook` (`gitsanity.installHook`).
-- **Uninstallation**: `GitSanity: Uninstall Pre-commit Hook` (`gitsanity.uninstallHook`).
-- **How It Works**:
-  - Bundled as a standalone Node.js script via `esbuild` (`out/hook/pre-commit.bundle.js`) with zero runtime dependencies.
-  - Installed inside `.git/hooks/pre-commit` wrapped with GitSanity marker tags (`# >>> GitSanity >>>` ... `# <<< GitSanity <<<`), co-existing safely with existing hooks.
-  - Uses `git rev-parse --git-path hooks` to support worktrees, submodules, and custom `core.hooksPath`.
-- **Index-Based Verification**: Inspects staged content directly from the Git index (`git show :<path>`), guaranteeing that modifications made to the working tree after `git add` cannot bypass the hook.
-- **Rules Enforced**:
-  - Blocks staged `.env` files (`env-file-staged`).
-  - Blocks staged files containing error-severity findings (secrets, conflict markers, debugger statements).
-  - Warns on files larger than `largeFileMB` (default 5 MB).
-  - Configurable `blockOnWarnings: true` to block commits on warning-level findings (e.g. `console.log`).
-  - Graceful fallback: always returns exit code 0 on unexpected runtime errors to avoid locking the user out of Git.
-
-### Safe Commit Flow
-- **Command**: `GitSanity: Safe Commit` (`gitsanity.safeCommit`).
-- **Pre-Flight Validation**: Runs full scanner checks on all staged files before invoking Git.
-- **Branch Protection**: Prompts for explicit confirmation if committing directly to protected branches (`main` or `master`).
-- **Auto Commit Message**: Suggests Conventional Commits messages (e.g. `feat(scanner): ...`, `fix(env): ...`, `docs: ...`, `chore: ...`) derived from staged file paths and changes, capped at 72 characters.
-- **Push & Undo Prompt**: After a successful commit, offers a one-click **Push** action or an **Undo Commit** option.
-
-### Safe Undo Commit
-- **Command**: `GitSanity: Undo Last Commit` (`gitsanity.undoCommit`).
-- **Safety Guards**: Executes `git reset --soft HEAD~1`, preserving all working tree and index changes.
-- **Protection**: Verifies the commit has not already been pushed to the remote, prevents undoing the repository's initial root commit, and warns on merge commits.
+### Safe Commit & Review Panel
+- **`GitSanity: Review Before Commit`**: Opens an interactive webview displaying all staged files and findings, interactive human checklists ("I reviewed console.log statements", "I confirmed protected branch"), and an editable commit message with a 72-character first-line counter.
+- **`GitSanity: Safe Commit`**: Fast pre-flight scan from the Command Palette, prompts for confirmation before committing directly to `main` or `master`, generates Conventional Commits messages, and provides one-click **Push** and **Undo** buttons after commit.
 
 ---
 
-## GitHub Publishing
+## Analytics Dashboard & Clean Streaks
 
-- **Command**: `GitSanity: Publish to GitHub` (`gitsanity.publishToGitHub`).
-- **Secure Remote Creation**: Creates a private or public GitHub repository via GitHub REST API using Node's native `https` module (zero external dependencies).
-- **Authentication**: Accepts a GitHub Personal Access Token (PAT) with `repo` scope.
-- **Token Redaction**: Tokens and remote URLs are strictly redacted across all output channels, error messages, and logs.
-- **Automatic Setup**: Sets `origin` remote, renames the local branch to `main`, and runs `git push -u origin <branch>` with confirmation.
+Run `GitSanity: Show Dashboard` to view your security and hygiene metrics:
+- **Clean Commit Streak**: Tracks consecutive commits with 0 errors and 0 warnings.
+- **Milestone Badges**: Unlockable achievements at 7, 30, and 100 clean commits.
+- **Weekly Trend Chart**: Inline SVG bar chart tracking errors and warnings over the last 8 weeks (with accessible data table fallback).
+- **Top 5 Mistakes**: Identifies the rules most frequently triggered in your project.
 
 ---
 
-## Configuration Reference
+## Configuration (`.gitsanity.json`)
 
-### `.gitsanity.json` File Schema
+Configure GitSanity per repository by creating a `.gitsanity.json` file in your workspace root (or run `GitSanity: Create Config File`):
 
 ```json
 {
@@ -200,11 +113,12 @@ GitSanity ensures zero secrets or forgotten debug code escape into Git history.
     "debugger": "error",
     "conflict-marker": "error",
     "secret": "error",
-    "high-entropy-string": "warn"
+    "high-entropy-string": "warn",
+    "old-todo": "off"
   },
   "ignorePaths": [
-    "tests/",
-    "scripts/",
+    "tests/**",
+    "scripts/**",
     "docs/**/*.md"
   ],
   "maxFileSizeMB": 1,
@@ -215,47 +129,68 @@ GitSanity ensures zero secrets or forgotten debug code escape into Git history.
   "createEnvExample": true,
   "largeFileMB": 5,
   "maxProjectFiles": 20000,
-  "blockOnWarnings": false
+  "blockOnWarnings": false,
+  "todoMaxAgeDays": 90
 }
 ```
 
-### VS Code Settings (`settings.json`)
+### Inline Ignore Directives
 
-- `gitsanity.promptOnOpen`: Prompt to initialize Git or scan project on folder open (default: `true`).
-- `gitsanity.warnOnMainBranch`: Warn when committing directly to `main` or `master` (default: `true`).
-- `gitsanity.historyMaxCommits`: Limit number of commits scanned in history (default: `500`).
+You can suppress findings directly inside your code using comments:
 
----
+- `// gitsanity-ignore`: Suppresses all findings on the current line.
+- `// gitsanity-ignore console-log, debugger`: Suppresses only specified rules on the current line.
+- `// gitsanity-ignore-next-line [rules]`: Suppresses findings on the following line.
+- `// gitsanity-ignore-file`: Place in the first 10 lines of a file to ignore the entire file.
 
-## Command Reference
-
-| Command ID | Title | Description |
-|---|---|---|
-| `gitsanity.menu` | `GitSanity: Menu` | Opens QuickPick menu of GitSanity actions |
-| `gitsanity.createConfig` | `GitSanity: Create Config File` | Creates `.gitsanity.json` in workspace root |
-| `gitsanity.rescanOpenFiles` | `GitSanity: Rescan Open Files` | Manually re-scans all open editors |
-| `gitsanity.scanProject` | `GitSanity: Scan Entire Project` | Scans entire repository into `gitsanity-project` |
-| `gitsanity.showHealthReport` | `GitSanity: Show Repository Health Report` | Opens the interactive Health Report webview |
-| `gitsanity.scanHistory` | `GitSanity: Scan Git History for Leaked Secrets` | Inspects commit history for committed secrets |
-| `gitsanity.installHook` | `GitSanity: Install Pre-commit Hook` | Installs the index-checking pre-commit hook |
-| `gitsanity.uninstallHook` | `GitSanity: Uninstall Pre-commit Hook` | Removes the GitSanity hook block |
-| `gitsanity.safeCommit` | `GitSanity: Safe Commit` | Pre-flight index check, branch check, commit & push |
-| `gitsanity.undoCommit` | `GitSanity: Undo Last Commit` | Soft resets `HEAD~1` if not yet pushed |
-| `gitsanity.publishToGitHub` | `GitSanity: Publish to GitHub` | Creates remote repo via GitHub API and pushes |
-| `gitsanity.createRepository` | `GitSanity: Initialize Git Repository` | Inits Git repository and generates `.gitignore` |
-| `gitsanity.moveSecretToEnv` | `GitSanity: Move Secret to .env` | Quick fix migration for single secret |
-| `gitsanity.moveAllSecretsInFile` | `GitSanity: Move All Secrets in This File to .env` | Batch migration for all secrets in file |
-| `gitsanity.addEnvToGitignore` | `GitSanity: Add .env to .gitignore` | Appends `.env` to `.gitignore` |
+Directives work in comments across all languages (`//`, `#`, `/* ... */`, `<!-- ... -->`, `--`, `;`, `%`).
 
 ---
 
-1. Install dependencies:
-   ```bash
-   npm install
-   ```
-2. Compile and run test suite:
-   ```bash
-   npm test
-   ```
-3. Press `F5` to start the Extension Development Host window.
-4. Open `samples/test.js` or `samples/test.py` to test diagnostics, quick fixes, and `.env` automation.
+## VS Code Settings
+
+Custom settings available under `Settings > Extensions > GitSanity`:
+
+- `gitsanity.promptOnOpen`: Prompt to initialize Git or run a project scan when opening a folder (default: `true`).
+- `gitsanity.warnOnMainBranch`: Warn before committing directly to `main` or `master` (default: `true`).
+- `gitsanity.historyMaxCommits`: Maximum commits to inspect during Git history scans (default: `500`).
+
+---
+
+## Privacy & Security
+
+- **100% Local Execution**: All rule scans, entropy calculations, and Git checks run locally on your machine.
+- **No Telemetry**: GitSanity collects zero analytics and contains no tracking code or telemetry.
+- **Sanitized Logs**: Commit events and streaks are logged strictly inside your local `.git` directory (`<git-common-dir>/gitsanity/events.jsonl`). Logs contain **only** counts and rule IDs—never file paths, code snippets, or secret values.
+- **Token Protection**: GitHub Personal Access Tokens used during GitHub publishing are processed entirely in-memory and never saved to disk. All logs, error messages, and output channels strictly redact tokens and credentials.
+- **Workspace Trust**: In untrusted workspaces, all Git, hook, and CLI capabilities are disabled. In-editor document scanning continues safely without executing external processes.
+
+---
+
+## Known Limitations
+
+- **Large Repositories**: Whole-project scans on repositories with over 20,000 files will scan up to the configured `maxProjectFiles` limit.
+- **Binary Files**: Binary files are detected via null-byte inspection and skipped automatically.
+- **History Rewriting**: GitSanity does not rewrite Git history. If a secret was committed in the past, GitSanity reports the commit hash and author so you can rotate the credential.
+
+---
+
+## FAQ & Troubleshooting
+
+**Q: The pre-commit hook failed with "node: command not found".**
+Git hooks run in the environment of your Git client. Ensure Node.js (v16 or higher) is available on your system `PATH`.
+
+**Q: Can I bypass the pre-commit hook in an emergency?**
+Yes. You can bypass the hook using standard Git syntax: `git commit --no-verify -m "commit message"`.
+
+**Q: What should I do if GitSanity reports a secret in Git history?**
+Removing the secret from your current files does not delete it from past commits. Anyone with access to the repository can view past commits in the Git log. **Immediately rotate and revoke the compromised token or key** with the service provider.
+
+**Q: How do I uninstall the Git hook?**
+Run `GitSanity: Uninstall Git Hook` from the Command Palette. This cleanly removes the GitSanity hook block while preserving any other hooks you have configured.
+
+---
+
+## License
+
+MIT License. See [LICENSE](file:///c:/Users/opg21/OneDrive/Desktop/GitSanity/LICENSE) for details.

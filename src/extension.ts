@@ -5,22 +5,14 @@ import { GitSanityCodeActionProvider } from './fixes/codeActionProvider';
 import { moveSecretToEnv, moveAllSecretsInFile } from './fixes/moveToEnv';
 import { EnvWatcher } from './env/envWatcher';
 import { checkRepoPromptsOnOpen } from './commands/repoPrompts';
-import { scanProjectCommand, clearProjectScanCommand } from './commands/projectScanCommand';
-import {
-  createRepositoryCommand,
-  showHealthReportCommand,
-  scanHistoryCommand,
-  publishToGitHubCommand,
-  installHookCommand,
-  uninstallHookCommand
-} from './commands/repoCommands';
-import { safeCommitCommand } from './commands/safeCommit';
-import { undoLastCommitCommand } from './commands/undoCommit';
-import { showGitSanityMenu } from './commands/menu';
 import { detectRepoState } from './git/repoDetector';
-import { isGitSanityHookInstalled } from './git/hookInstaller';
+import { isGitSanityHookInstalled, resolveGitPaths } from './git/hookInstaller';
+import { getEventLogPath, readEvents } from './stats/eventLog';
+import { computeStreak } from './stats/stats';
 
 export function activate(context: vscode.ExtensionContext): void {
+  const startTime = Date.now();
+
   // 1. Output Channel & Separate Project DiagnosticCollection
   const outputChannel = vscode.window.createOutputChannel('GitSanity');
   const projectDiagnostics = vscode.languages.createDiagnosticCollection('gitsanity-project');
@@ -46,6 +38,7 @@ export function activate(context: vscode.ExtensionContext): void {
   const updateStatusBar = async (counts: IssueCounts): Promise<void> => {
     let branchInfo = '';
     let hookInfo = '';
+    let streakInfo = '';
 
     const folders = vscode.workspace.workspaceFolders || [];
     if (folders.length > 0 && folders[0].uri.scheme === 'file') {
@@ -56,17 +49,25 @@ export function activate(context: vscode.ExtensionContext): void {
         }
         const hookActive = await isGitSanityHookInstalled(folders[0].uri.fsPath);
         hookInfo = ` | Hook: ${hookActive ? 'active' : 'inactive'}`;
+
+        const { commonDir } = await resolveGitPaths(folders[0].uri.fsPath);
+        const logPath = getEventLogPath(commonDir);
+        const events = await readEvents(logPath);
+        const streak = computeStreak(events);
+        if (streak >= 1) {
+          streakInfo = ` | Streak: ${streak} clean commit${streak === 1 ? '' : 's'}`;
+        }
       } catch {}
     }
 
     if (counts.total === 0) {
       statusBarItem.text = '$(shield) GitSanity: Clean';
-      statusBarItem.tooltip = `GitSanity: Clean (0 issues)${branchInfo}${hookInfo}. Click for GitSanity menu.`;
+      statusBarItem.tooltip = `GitSanity: Clean (0 issues)${branchInfo}${hookInfo}${streakInfo}. Click for GitSanity menu.`;
     } else {
       const errorText = `${counts.errors} error${counts.errors === 1 ? '' : 's'}`;
       const warningText = `${counts.warnings} warning${counts.warnings === 1 ? '' : 's'}`;
       statusBarItem.text = `$(error) ${counts.errors} errors, $(warning) ${counts.warnings} warnings`;
-      statusBarItem.tooltip = `GitSanity: ${errorText}, ${warningText}${branchInfo}${hookInfo}. Click for GitSanity menu.`;
+      statusBarItem.tooltip = `GitSanity: ${errorText}, ${warningText}${branchInfo}${hookInfo}${streakInfo}. Click for GitSanity menu.`;
     }
   };
 
@@ -79,7 +80,7 @@ export function activate(context: vscode.ExtensionContext): void {
     updateStatusBar(counts);
   });
 
-  // 5. Register Commands
+  // 5. Register Commands (Lazy-load heavy modules to ensure fast activation)
   const createConfigCommand = vscode.commands.registerCommand('gitsanity.createConfig', async () => {
     const folders = vscode.workspace.workspaceFolders;
     if (!folders || folders.length === 0) {
@@ -102,10 +103,11 @@ export function activate(context: vscode.ExtensionContext): void {
       $schema: './schemas/gitsanity.schema.json',
       rules: {
         'console-log': 'warn',
-        debugger: 'error',
+        debugger: 'error', // gitsanity-ignore debugger
         'conflict-marker': 'error',
         secret: 'error',
-        'high-entropy-string': 'warn'
+        'high-entropy-string': 'warn',
+        'old-todo': 'off'
       },
       ignorePaths: ['tests/', 'scripts/'],
       maxFileSizeMB: 1,
@@ -116,7 +118,8 @@ export function activate(context: vscode.ExtensionContext): void {
       createEnvExample: true,
       largeFileMB: 5,
       maxProjectFiles: 20000,
-      blockOnWarnings: false
+      blockOnWarnings: false,
+      todoMaxAgeDays: 90
     };
 
     const content = Buffer.from(JSON.stringify(starterConfig, null, 2), 'utf8');
@@ -152,12 +155,14 @@ export function activate(context: vscode.ExtensionContext): void {
   );
 
   const menuCommand = vscode.commands.registerCommand('gitsanity.menu', async () => {
+    const { showGitSanityMenu } = await import('./commands/menu');
     await showGitSanityMenu();
   });
 
   const createRepoCommand = vscode.commands.registerCommand(
     'gitsanity.createRepository',
     async (folder?: vscode.WorkspaceFolder) => {
+      const { createRepositoryCommand } = await import('./commands/repoCommands');
       await createRepositoryCommand(configLoader, projectDiagnostics, folder);
     }
   );
@@ -165,17 +170,20 @@ export function activate(context: vscode.ExtensionContext): void {
   const scanProjCommand = vscode.commands.registerCommand(
     'gitsanity.scanProject',
     async (folder?: vscode.WorkspaceFolder) => {
+      const { scanProjectCommand } = await import('./commands/projectScanCommand');
       await scanProjectCommand(configLoader, projectDiagnostics, folder);
     }
   );
 
-  const clearProjCommand = vscode.commands.registerCommand('gitsanity.clearProjectScan', () => {
+  const clearProjCommand = vscode.commands.registerCommand('gitsanity.clearProjectScan', async () => {
+    const { clearProjectScanCommand } = await import('./commands/projectScanCommand');
     clearProjectScanCommand(projectDiagnostics);
   });
 
   const healthReportCommand = vscode.commands.registerCommand(
     'gitsanity.showHealthReport',
     async (folder?: vscode.WorkspaceFolder) => {
+      const { showHealthReportCommand } = await import('./commands/repoCommands');
       await showHealthReportCommand(configLoader, projectDiagnostics, folder);
     }
   );
@@ -183,6 +191,7 @@ export function activate(context: vscode.ExtensionContext): void {
   const scanHistoryCmd = vscode.commands.registerCommand(
     'gitsanity.scanHistory',
     async (folder?: vscode.WorkspaceFolder) => {
+      const { scanHistoryCommand } = await import('./commands/repoCommands');
       await scanHistoryCommand(configLoader, folder);
     }
   );
@@ -190,6 +199,7 @@ export function activate(context: vscode.ExtensionContext): void {
   const publishToGitHubCmd = vscode.commands.registerCommand(
     'gitsanity.publishToGitHub',
     async (folder?: vscode.WorkspaceFolder) => {
+      const { publishToGitHubCommand } = await import('./commands/repoCommands');
       await publishToGitHubCommand(configLoader, folder);
     }
   );
@@ -197,6 +207,7 @@ export function activate(context: vscode.ExtensionContext): void {
   const installHookCmd = vscode.commands.registerCommand(
     'gitsanity.installHook',
     async (folder?: vscode.WorkspaceFolder) => {
+      const { installHookCommand } = await import('./commands/repoCommands');
       await installHookCommand(context, folder);
     }
   );
@@ -204,20 +215,38 @@ export function activate(context: vscode.ExtensionContext): void {
   const uninstallHookCmd = vscode.commands.registerCommand(
     'gitsanity.uninstallHook',
     async (folder?: vscode.WorkspaceFolder) => {
+      const { uninstallHookCommand } = await import('./commands/repoCommands');
       await uninstallHookCommand(folder);
     }
   );
 
   const safeCommitCmd = vscode.commands.registerCommand('gitsanity.safeCommit', async () => {
+    const { safeCommitCommand } = await import('./commands/safeCommit');
     await safeCommitCommand(configLoader, projectDiagnostics, outputChannel);
   });
 
   const undoCommitCmd = vscode.commands.registerCommand(
     'gitsanity.undoLastCommit',
     async (folder?: vscode.WorkspaceFolder) => {
+      const { undoLastCommitCommand } = await import('./commands/undoCommit');
       await undoLastCommitCommand(folder);
     }
   );
+
+  const reviewBeforeCommitCmd = vscode.commands.registerCommand('gitsanity.reviewBeforeCommit', async () => {
+    const { ReviewPanelManager } = await import('./ui/reviewPanel');
+    await ReviewPanelManager.createOrShow(context.extensionUri, configLoader, outputChannel);
+  });
+
+  const showDashboardCmd = vscode.commands.registerCommand('gitsanity.showDashboard', async () => {
+    const { DashboardPanelManager } = await import('./ui/dashboard');
+    await DashboardPanelManager.createOrShow(context.extensionUri);
+  });
+
+  const findOldTodosCmd = vscode.commands.registerCommand('gitsanity.findOldTodos', async () => {
+    const { findOldTodosCommand } = await import('./commands/todoCommands');
+    await findOldTodosCommand(configLoader);
+  });
 
   // 6. Register all disposables
   context.subscriptions.push(
@@ -244,11 +273,19 @@ export function activate(context: vscode.ExtensionContext): void {
     installHookCmd,
     uninstallHookCmd,
     safeCommitCmd,
-    undoCommitCmd
+    undoCommitCmd,
+    reviewBeforeCommitCmd,
+    showDashboardCmd,
+    findOldTodosCmd
   );
 
   // 7. On-open prompt (asynchronous, non-blocking)
   checkRepoPromptsOnOpen(context);
+
+  // 8. Debug activation measurement
+  if (context.extensionMode === vscode.ExtensionMode.Development) {
+    outputChannel.appendLine(`[debug] GitSanity activated in ${Date.now() - startTime}ms`);
+  }
 }
 
 export function deactivate(): void {}

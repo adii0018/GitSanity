@@ -1,0 +1,35 @@
+{
+  "$schema": "./schemas/gitsanity.schema.json",
+  "rules": {
+    "console-log": "warn",
+    "debugger": "error",
+    "conflict-marker": "error",
+    "secret": "error",
+    "high-entropy-string": "warn",
+    "old-todo": "off"
+  },
+  "ignorePaths": [
+    "samples/**",
+    "tests/**",
+    "**/*.test.ts",
+    "**/*.test.js",
+    "scripts/**",
+    "docs/**",
+    "media/**",
+    "out/**",
+    "out-test/**",
+    "schemas/**",
+    "*.json",
+    "*.md"
+  ],
+  "maxFileSizeMB": 1,
+  "entropyThreshold": 4.5,
+  "entropyMinLength": 20,
+  "envFile": ".env",
+  "envExampleFile": ".env.example",
+  "createEnvExample": true,
+  "largeFileMB": 5,
+  "maxProjectFiles": 20000,
+  "blockOnWarnings": false,
+  "todoMaxAgeDays": 90
+}

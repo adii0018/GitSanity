@@ -2,22 +2,52 @@
   "name": "gitsanity",
   "displayName": "GitSanity",
   "description": "Scan, secure and commit safely",
-  "version": "0.0.1",
+  "version": "0.1.0",
+  "preview": true,
   "publisher": "your-publisher-id",
+  "license": "MIT",
   "engines": {
     "vscode": "^1.80.0"
   },
   "categories": [
     "Linters",
+    "SCM Providers",
     "Other"
   ],
+  "keywords": [
+    "secrets",
+    "git",
+    "commit",
+    "pre-commit",
+    "security",
+    "env",
+    "linter",
+    "console.log",
+    "credentials"
+  ],
+  "icon": "media/icon.png",
+  "galleryBanner": {
+    "color": "#0B1B2B",
+    "theme": "dark"
+  },
+  "extensionKind": [
+    "workspace"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/<your-username>/gitsanity"
+  },
+  "bugs": {
+    "url": "https://github.com/<your-username>/gitsanity/issues"
+  },
+  "homepage": "https://github.com/<your-username>/gitsanity#readme",
   "activationEvents": [
     "onStartupFinished"
   ],
   "capabilities": {
     "untrustedWorkspaces": {
       "supported": "limited",
-      "description": "Git repository operations, pre-commit hook management, and GitHub publishing are disabled in untrusted workspaces. Live file checking remains active."
+      "description": "Git repository operations, pre-commit hook management, and GitHub publishing are disabled in untrusted workspaces. In-editor scanning remains active."
     }
   },
   "main": "./out/extension.js",
@@ -26,6 +56,16 @@
       {
         "command": "gitsanity.menu",
         "title": "GitSanity: Show Menu",
+        "category": "GitSanity"
+      },
+      {
+        "command": "gitsanity.showDashboard",
+        "title": "GitSanity: Show Dashboard",
+        "category": "GitSanity"
+      },
+      {
+        "command": "gitsanity.reviewBeforeCommit",
+        "title": "GitSanity: Review Before Commit",
         "category": "GitSanity"
       },
       {
@@ -56,6 +96,11 @@
       {
         "command": "gitsanity.scanHistory",
         "title": "GitSanity: Scan Git History",
+        "category": "GitSanity"
+      },
+      {
+        "command": "gitsanity.findOldTodos",
+        "title": "GitSanity: Find Old TODOs",
         "category": "GitSanity"
       },
       {
@@ -132,14 +177,18 @@
     ]
   },
   "scripts": {
-    "compile": "tsc -p ./ && npm run build:hook",
+    "check": "tsc -p ./ --noEmit",
+    "bundle": "esbuild src/extension.ts --bundle --platform=node --target=node16 --external:vscode --outfile=out/extension.js --minify --sourcemap",
     "build:hook": "esbuild src/hook/preCommit.ts --bundle --platform=node --target=node16 --outfile=out/hook/pre-commit.bundle.js",
-    "watch": "tsc -watch -p ./",
-    "test": "npm run compile && node scripts/runTests.js"
+    "compile": "npm run check && npm run bundle && npm run build:hook",
+    "watch": "esbuild src/extension.ts --bundle --platform=node --target=node16 --external:vscode --outfile=out/extension.js --sourcemap --watch",
+    "test": "npm run build:hook && tsc -p tsconfig.test.json && node scripts/runTests.js",
+    "vscode:prepublish": "npm run check && npm run bundle && npm run build:hook"
   },
   "devDependencies": {
     "@types/node": "^20.11.0",
     "@types/vscode": "^1.80.0",
+    "@vscode/vsce": "^3.2.1",
     "esbuild": "^0.25.0",
     "typescript": "^5.3.3"
   }

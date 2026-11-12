@@ -16,15 +16,16 @@ function findTestFiles(dir, out = []) {
   return out;
 }
 
-const outDir = path.join(__dirname, '..', 'out');
+const outTestDir = path.join(__dirname, '..', 'out-test');
+const outDir = fs.existsSync(outTestDir) ? outTestDir : path.join(__dirname, '..', 'out');
 const testFiles = findTestFiles(outDir);
 
 if (testFiles.length === 0) {
-  console.error('No .test.js files found under out/. Run npm run compile first.');
+  console.error(`No .test.js files found under ${outDir}.`);
   process.exit(1);
 }
 
-console.log(`Found ${testFiles.length} test suite(s). Executing...\n`);
+console.log(`Found ${testFiles.length} test suite(s) in ${path.basename(outDir)}. Executing...\n`);
 
 let hasFailures = false;
 
