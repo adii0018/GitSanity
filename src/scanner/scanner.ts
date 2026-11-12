@@ -1,5 +1,5 @@
 import { RuleId, KNOWN_RULE_IDS, DEFAULT_CONFIG } from '../config/configSchema';
-import { Finding, FindingMeta, Severity, standardRules } from './rules';
+import { Finding, FindingMeta, Severity, standardRules, LineContext } from './rules';
 import { findHighEntropyCandidates } from './entropy';
 
 export { Finding, FindingMeta, Severity, Rule } from './rules';
