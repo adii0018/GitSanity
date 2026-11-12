@@ -36,6 +36,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.undoLastCommitCommand = undoLastCommitCommand;
 const vscode = __importStar(require("vscode"));
 const gitRunner_1 = require("../git/gitRunner");
+const redact_1 = require("../git/redact");
 async function undoLastCommitCommand(folder) {
     if (!vscode.workspace.isTrusted) {
         vscode.window.showErrorMessage('GitSanity: Git operations are disabled in untrusted workspaces.');
@@ -89,7 +90,7 @@ async function undoLastCommitCommand(folder) {
     }
     const resetRes = await (0, gitRunner_1.runGit)(['reset', '--soft', 'HEAD~1'], root);
     if (resetRes.code !== 0) {
-        vscode.window.showErrorMessage(`GitSanity: Failed to undo commit: ${resetRes.stderr}`);
+        vscode.window.showErrorMessage(`GitSanity: Failed to undo commit: ${(0, redact_1.redact)(resetRes.stderr)}`);
         return;
     }
     vscode.window.showInformationMessage('GitSanity: Successfully undone last commit. Changes remain staged.');

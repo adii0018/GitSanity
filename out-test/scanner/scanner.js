@@ -41,6 +41,10 @@ function scanText(text, options) {
     if (!text) {
         return [];
     }
+    // Strip leading UTF-8 BOM if present
+    if (text.charCodeAt(0) === 0xFEFF) {
+        text = text.slice(1);
+    }
     const lines = text.split(/\r?\n/);
     // 1. File-level ignore: if found in the first 10 lines, return zero findings
     const first10Lines = lines.slice(0, 10);
@@ -55,8 +59,21 @@ function scanText(text, options) {
     const entropyMinLength = options?.entropyMinLength ?? configSchema_1.DEFAULT_CONFIG.entropyMinLength;
     const findings = [];
     let pendingNextLineIgnores = [];
+    let inConflictBlock = false;
+    const MAX_LINE_SCAN_LENGTH = 5000;
     for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
-        const line = lines[lineIndex];
+        const rawLine = lines[lineIndex];
+        const prevLine = lineIndex > 0 ? lines[lineIndex - 1] : undefined;
+        // Cap line length to prevent ReDoS on massive/minified lines
+        const line = rawLine.length > MAX_LINE_SCAN_LENGTH ? rawLine.slice(0, MAX_LINE_SCAN_LENGTH) : rawLine;
+        // Track merge conflict block
+        if (/^<{7}(\s.*)?$/.test(line)) {
+            inConflictBlock = true;
+        }
+        const context = {
+            inConflictBlock,
+            prevLine
+        };
         // Ignores active for this line (from previous next-line directives)
         const activeIgnoresForLine = [...pendingNextLineIgnores];
         pendingNextLineIgnores = [];
@@ -110,12 +127,15 @@ function scanText(text, options) {
                 continue;
             }
             const severity = setting === 'error' ? 'error' : 'warning';
-            const rawRuleFindings = rule.checkLine(line, lineIndex, severity);
+            const rawRuleFindings = rule.checkLine(line, lineIndex, severity, context);
             const ruleFindings = rawRuleFindings.filter(f => !isInsideDirective(f));
             if (rule.id === 'secret' && ruleFindings.length > 0) {
                 hasSecretOnLine = true;
             }
             findings.push(...ruleFindings);
+        }
+        if (/^>{7}(\s.*)?$/.test(line)) {
+            inConflictBlock = false;
         }
         // Check high-entropy-string rule (only if line was not already flagged by secret)
         const entropySetting = ruleSettings['high-entropy-string'];

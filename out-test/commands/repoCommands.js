@@ -108,13 +108,17 @@ async function createRepositoryCommand(configLoader, projectDiagnostics, targetF
         vscode.window.showInformationMessage('GitSanity: Created initial commit ("chore: initial commit").');
     }
     else {
-        vscode.window.showErrorMessage(`GitSanity: Initial commit failed: ${commitRes.stderr}`);
+        vscode.window.showErrorMessage(`GitSanity: Initial commit failed: ${(0, redact_1.redact)(commitRes.stderr)}`);
     }
 }
 /**
  * gitsanity.showHealthReport command
  */
 async function showHealthReportCommand(configLoader, projectDiagnostics, targetFolder) {
+    if (!vscode.workspace.isTrusted) {
+        vscode.window.showErrorMessage('GitSanity: Git operations and health reports are disabled in untrusted workspaces.');
+        return;
+    }
     const folder = getActiveFolder(targetFolder);
     if (!folder) {
         vscode.window.showErrorMessage('GitSanity: No workspace folder open.');
@@ -189,6 +193,10 @@ async function showHealthReportCommand(configLoader, projectDiagnostics, targetF
  * gitsanity.scanHistory command
  */
 async function scanHistoryCommand(configLoader, targetFolder) {
+    if (!vscode.workspace.isTrusted) {
+        vscode.window.showErrorMessage('GitSanity: Git operations and history scanning are disabled in untrusted workspaces.');
+        return;
+    }
     const folder = getActiveFolder(targetFolder);
     if (!folder)
         return;
@@ -315,7 +323,7 @@ async function publishToGitHubCommand(configLoader, targetFolder) {
     // git remote add origin <clone_url>
     const remoteRes = await (0, gitRunner_1.runGit)(['remote', 'add', 'origin', createRes.cloneUrl], root);
     if (remoteRes.code !== 0) {
-        vscode.window.showErrorMessage(`GitSanity: Failed to add remote origin: ${remoteRes.stderr}`);
+        vscode.window.showErrorMessage(`GitSanity: Failed to add remote origin: ${(0, redact_1.redact)(remoteRes.stderr)}`);
         return;
     }
     // Ask to push now

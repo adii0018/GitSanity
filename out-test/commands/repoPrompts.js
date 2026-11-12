@@ -38,6 +38,9 @@ const vscode = __importStar(require("vscode"));
 const repoDetector_1 = require("../git/repoDetector");
 const sessionCheckedFolders = new Set();
 async function checkRepoPromptsOnOpen(context) {
+    if (!vscode.workspace.isTrusted) {
+        return;
+    }
     const folders = vscode.workspace.workspaceFolders || [];
     if (folders.length === 0) {
         return;

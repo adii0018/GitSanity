@@ -37,6 +37,7 @@ exports.initRepo = initRepo;
 const fs = __importStar(require("fs"));
 const path = __importStar(require("path"));
 const gitRunner_1 = require("./gitRunner");
+const redact_1 = require("./redact");
 const gitignoreTemplate_1 = require("./gitignoreTemplate");
 const gitignoreFile_1 = require("../env/gitignoreFile");
 /**
@@ -67,7 +68,7 @@ async function initRepo(folderPath, envFileName = '.env') {
     if (initRes.code !== 0) {
         return {
             success: false,
-            error: initRes.stderr || 'git init failed',
+            error: (0, redact_1.redact)(initRes.stderr) || 'git init failed',
             createdGitignore: false
         };
     }

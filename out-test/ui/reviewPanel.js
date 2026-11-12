@@ -88,15 +88,20 @@ class ReviewPanelManager {
                 await ReviewPanelManager.updateContent(panel, targetFolder, configLoader, outputChannel);
             }
             else if (msg.command === 'openFile') {
-                const filePath = path.join(root, msg.file);
-                try {
-                    const doc = await vscode.workspace.openTextDocument(filePath);
-                    const line = Math.max(0, (msg.line || 1) - 1);
-                    await vscode.window.showTextDocument(doc, {
-                        selection: new vscode.Range(line, 0, line, 0)
-                    });
+                if (typeof msg.file === 'string') {
+                    const normRoot = path.resolve(root);
+                    const filePath = path.resolve(normRoot, msg.file);
+                    if (filePath === normRoot || filePath.startsWith(normRoot + path.sep)) {
+                        try {
+                            const doc = await vscode.workspace.openTextDocument(filePath);
+                            const line = Math.max(0, (typeof msg.line === 'number' ? msg.line : 1) - 1);
+                            await vscode.window.showTextDocument(doc, {
+                                selection: new vscode.Range(line, 0, line, 0)
+                            });
+                        }
+                        catch { }
+                    }
                 }
-                catch { }
             }
             else if (msg.command === 'stageFiles') {
                 const statusRes = await (0, gitRunner_1.runGit)(['status', '--porcelain=v1', '-z'], root);

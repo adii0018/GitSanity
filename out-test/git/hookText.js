@@ -29,18 +29,19 @@ function installHookBlock(existing) {
     if (!existing || existing.trim().length === 0) {
         return `#!/bin/sh\n\n${exports.HOOK_PAYLOAD.join('\n')}\n`;
     }
-    const eol = existing.includes('\r\n') ? '\r\n' : '\n';
-    const payloadStr = exports.HOOK_PAYLOAD.join(eol);
+    // Shell scripts must always use LF (\n) line endings, even on Windows
+    const normalized = existing.replace(/\r\n/g, '\n');
+    const payloadStr = exports.HOOK_PAYLOAD.join('\n');
     // If markers already exist, replace the block idempotently
-    if (isHookInstalled(existing)) {
-        const startIndex = existing.indexOf(exports.HOOK_START_MARKER);
-        const endIndex = existing.indexOf(exports.HOOK_END_MARKER) + exports.HOOK_END_MARKER.length;
-        const before = existing.slice(0, startIndex);
-        const after = existing.slice(endIndex);
+    if (isHookInstalled(normalized)) {
+        const startIndex = normalized.indexOf(exports.HOOK_START_MARKER);
+        const endIndex = normalized.indexOf(exports.HOOK_END_MARKER) + exports.HOOK_END_MARKER.length;
+        const before = normalized.slice(0, startIndex);
+        const after = normalized.slice(endIndex);
         return before + payloadStr + after;
     }
     // Check shebang compatibility
-    const firstLine = existing.split(/\r?\n/)[0].trim();
+    const firstLine = normalized.split('\n')[0].trim();
     if (firstLine.startsWith('#!')) {
         const isShOrBash = firstLine.includes('sh') ||
             firstLine.includes('bash') ||
@@ -49,8 +50,8 @@ function installHookBlock(existing) {
             throw new Error(`Existing pre-commit hook uses an unsupported interpreter (${firstLine}). GitSanity hook requires sh/bash.`);
         }
     }
-    const base = existing.endsWith('\n') ? existing : existing + eol;
-    return `${base}${eol}${payloadStr}${eol}`;
+    const base = normalized.endsWith('\n') ? normalized : normalized + '\n';
+    return `${base}\n${payloadStr}\n`;
 }
 /**
  * Removes the GitSanity hook block from a pre-commit script.

@@ -95,12 +95,17 @@ class DashboardPanelManager {
                 vscode.commands.executeCommand('gitsanity.installHook', targetFolder);
             }
             else if (msg.command === 'openFile') {
-                const filePath = path.join(targetFolder.uri.fsPath, msg.file);
-                try {
-                    const doc = await vscode.workspace.openTextDocument(filePath);
-                    await vscode.window.showTextDocument(doc);
+                if (typeof msg.file === 'string') {
+                    const root = path.resolve(targetFolder.uri.fsPath);
+                    const filePath = path.resolve(root, msg.file);
+                    if (filePath === root || filePath.startsWith(root + path.sep)) {
+                        try {
+                            const doc = await vscode.workspace.openTextDocument(filePath);
+                            await vscode.window.showTextDocument(doc);
+                        }
+                        catch { }
+                    }
                 }
-                catch { }
             }
             else if (msg.command === 'resetStats') {
                 const confirm = await vscode.window.showWarningMessage('Reset all GitSanity statistics for this repository?', { modal: true }, 'Reset');

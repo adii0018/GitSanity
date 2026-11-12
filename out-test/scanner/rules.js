@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.standardRules = exports.secretRule = exports.conflictMarkerRule = exports.debuggerRule = exports.consoleLogRule = void 0;
 exports.findAssignmentKey = findAssignmentKey;
+exports.isSecretFalsePositive = isSecretFalsePositive;
 // Regex for console.log
 const CONSOLE_LOG_REGEX = /\bconsole\.log\s*\(/g;
 // Regex for breakpoint
@@ -74,23 +75,70 @@ exports.debuggerRule = {
         severity);
     }
 };
+function isSecretFalsePositive(val, keyName) {
+    if (!val)
+        return true;
+    // 1. UUID check
+    if (/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(val)) {
+        return true;
+    }
+    // 2. Lockfile integrity strings (e.g. sha512-..., sha256-..., sha1-...)
+    if (/^sha(1|256|384|512)-[A-Za-z0-9+/=]+$/.test(val)) {
+        return true;
+    }
+    // 3. Example placeholders (e.g. "your-api-key-here", "your_secret_key", "your-token-here")
+    const lowerVal = val.toLowerCase();
+    if (lowerVal.includes('your-api-key') ||
+        lowerVal.includes('your_api_key') ||
+        lowerVal.includes('your-token') ||
+        lowerVal.includes('your_token') ||
+        lowerVal.includes('your-secret') ||
+        lowerVal.includes('your_secret') ||
+        lowerVal.includes('your-password') ||
+        lowerVal.includes('your_password') ||
+        lowerVal.includes('api-key-here') ||
+        lowerVal.includes('api_key_here') ||
+        lowerVal.includes('placeholder') ||
+        lowerVal.includes('example-token') ||
+        lowerVal.includes('fake-secret') ||
+        lowerVal.includes('dummy-secret') ||
+        lowerVal.includes('xxxx') ||
+        /^(?:your|my|example|sample|dummy|fake|test|placeholder)[-_]/i.test(val) ||
+        /[-_](?:here|placeholder|example|sample|dummy|fake|test)$/i.test(val)) {
+        return true;
+    }
+    // 4. Git commit hashes (40 or 64 hex characters)
+    if (/^[0-9a-fA-F]{40}$/.test(val) || /^[0-9a-fA-F]{64}$/.test(val)) {
+        if (keyName && /(commit|sha|revision|rev|git|tree|blob|parent|head|ref)/i.test(keyName)) {
+            return true;
+        }
+    }
+    return false;
+}
 exports.conflictMarkerRule = {
     id: 'conflict-marker',
-    checkLine(line, lineIndex, severity) {
-        const isConflictMarker = CONFLICT_MARKER_REGEXES.some(regex => regex.test(line));
-        if (isConflictMarker) {
-            return [
-                {
-                    line: lineIndex,
-                    startCol: 0,
-                    endCol: line.length,
-                    ruleId: 'conflict-marker',
-                    message: 'Merge conflict marker found. Resolve the conflict before committing.',
-                    severity
-                }
-            ];
+    checkLine(line, lineIndex, severity, context) {
+        const isHead = /^<{7}(\s.*)?$/.test(line);
+        const isSep = /^={7}$/.test(line);
+        const isEnd = /^>{7}(\s.*)?$/.test(line);
+        if (!isHead && !isSep && !isEnd) {
+            return [];
         }
-        return [];
+        // Markdown setext heading or divider: "=======" preceded by non-empty heading text
+        // when not inside an active conflict block
+        if (isSep && context?.prevLine && context.prevLine.trim().length > 0 && !context.inConflictBlock) {
+            return [];
+        }
+        return [
+            {
+                line: lineIndex,
+                startCol: 0,
+                endCol: line.length,
+                ruleId: 'conflict-marker',
+                message: 'Merge conflict marker found. Resolve the conflict before committing.',
+                severity
+            }
+        ];
     }
 };
 exports.secretRule = {
@@ -152,6 +200,12 @@ exports.secretRule = {
             const keyName = findAssignmentKey(line, startCol) || genMatch[1];
             const quote = genMatch[2];
             const val = genMatch[3];
+            if (isSecretFalsePositive(val, keyName)) {
+                if (genMatch.index === genRe.lastIndex) {
+                    genRe.lastIndex++;
+                }
+                continue;
+            }
             // Find literal span for this matched value
             const quoteStart = line.indexOf(quote + val + quote, startCol);
             const literalStartCol = quoteStart !== -1 ? quoteStart : startCol;
@@ -187,6 +241,12 @@ exports.secretRule = {
             const quotedVal = hexMatch[3];
             const unquotedVal = hexMatch[4];
             const val = quotedVal || unquotedVal;
+            if (isSecretFalsePositive(val, keyName)) {
+                if (hexMatch.index === hexRe.lastIndex) {
+                    hexRe.lastIndex++;
+                }
+                continue;
+            }
             let meta;
             if (quote && quotedVal) {
                 const quoteStart = line.indexOf(quote + quotedVal + quote, startCol);
