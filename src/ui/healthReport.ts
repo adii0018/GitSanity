@@ -31,12 +31,18 @@ export class HealthReportPanel {
       async (message) => {
         switch (message.command) {
           case 'openFile':
-            if (message.file && message.folderPath) {
-              const fullPath = path.join(message.folderPath, message.file);
-              try {
-                const doc = await vscode.workspace.openTextDocument(vscode.Uri.file(fullPath));
-                await vscode.window.showTextDocument(doc);
-              } catch {}
+            if (
+              typeof message.file === 'string' &&
+              typeof message.folderPath === 'string'
+            ) {
+              const root = path.resolve(message.folderPath);
+              const fullPath = path.resolve(root, message.file);
+              if (fullPath === root || fullPath.startsWith(root + path.sep)) {
+                try {
+                  const doc = await vscode.workspace.openTextDocument(vscode.Uri.file(fullPath));
+                  await vscode.window.showTextDocument(doc);
+                } catch {}
+              }
             }
             break;
           case 'rescan':

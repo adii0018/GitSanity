@@ -1,10 +1,22 @@
 import * as vscode from 'vscode';
+import * as path from 'path';
 import { ConfigLoader } from '../config/configLoader';
 import { scanText, Finding } from '../scanner/scanner';
 import { toEnvVarName } from '../env/envName';
 import { upsertEnvEntry, ensureExampleEntry } from '../env/envFile';
 import { isEnvIgnored, addEnvToGitignore } from '../env/gitignoreFile';
 import { getEnvAccessExpression } from '../env/envAccess';
+
+function getSafeWorkspaceFile(folder: vscode.WorkspaceFolder, relativePath: string | undefined, defaultName: string): { uri: vscode.Uri; fileName: string } {
+  const target = relativePath || defaultName;
+  const root = path.resolve(folder.uri.fsPath);
+  const resolved = path.resolve(root, target);
+  if (resolved !== root && !resolved.startsWith(root + path.sep)) {
+    return { uri: vscode.Uri.joinPath(folder.uri, defaultName), fileName: defaultName };
+  }
+  const rel = path.relative(root, resolved).replace(/\\/g, '/');
+  return { uri: vscode.Uri.file(resolved), fileName: rel || defaultName };
+}
 
 function pythonAlreadyImportsOs(text: string): boolean {
   const lines = text.split(/\r?\n/);
@@ -99,8 +111,7 @@ export async function moveSecretToEnv(
     return;
   }
 
-  const envFileName = config.envFile || '.env';
-  const envUri = vscode.Uri.joinPath(folder.uri, envFileName);
+  const { uri: envUri, fileName: envFileName } = getSafeWorkspaceFile(folder, config.envFile, '.env');
 
   let envText = '';
   try {
@@ -116,8 +127,7 @@ export async function moveSecretToEnv(
 
   // Update .env.example if enabled
   if (config.createEnvExample !== false) {
-    const exampleFileName = config.envExampleFile || '.env.example';
-    const exampleUri = vscode.Uri.joinPath(folder.uri, exampleFileName);
+    const { uri: exampleUri } = getSafeWorkspaceFile(folder, config.envExampleFile, '.env.example');
     let exampleText = '';
     try {
       const bytes = await vscode.workspace.fs.readFile(exampleUri);
@@ -215,8 +225,7 @@ export async function moveAllSecretsInFile(configLoader: ConfigLoader): Promise<
     return;
   }
 
-  const envFileName = config.envFile || '.env';
-  const envUri = vscode.Uri.joinPath(folder.uri, envFileName);
+  const { uri: envUri, fileName: envFileName } = getSafeWorkspaceFile(folder, config.envFile, '.env');
 
   let envText = '';
   try {
@@ -224,8 +233,7 @@ export async function moveAllSecretsInFile(configLoader: ConfigLoader): Promise<
     envText = Buffer.from(bytes).toString('utf8');
   } catch {}
 
-  const exampleFileName = config.envExampleFile || '.env.example';
-  const exampleUri = vscode.Uri.joinPath(folder.uri, exampleFileName);
+  const { uri: exampleUri } = getSafeWorkspaceFile(folder, config.envExampleFile, '.env.example');
   let exampleText = '';
   try {
     const bytes = await vscode.workspace.fs.readFile(exampleUri);

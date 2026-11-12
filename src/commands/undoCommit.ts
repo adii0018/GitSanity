@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { runGit } from '../git/gitRunner';
+import { redact } from '../git/redact';
 
 export async function undoLastCommitCommand(folder?: vscode.WorkspaceFolder): Promise<void> {
   if (!vscode.workspace.isTrusted) {
@@ -63,7 +64,7 @@ export async function undoLastCommitCommand(folder?: vscode.WorkspaceFolder): Pr
 
   const resetRes = await runGit(['reset', '--soft', 'HEAD~1'], root);
   if (resetRes.code !== 0) {
-    vscode.window.showErrorMessage(`GitSanity: Failed to undo commit: ${resetRes.stderr}`);
+    vscode.window.showErrorMessage(`GitSanity: Failed to undo commit: ${redact(resetRes.stderr)}`);
     return;
   }
 

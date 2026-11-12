@@ -83,7 +83,7 @@ export async function safeCommitCommand(
     const pathsToStage = selected.map((s) => s.label);
     const addRes = await runGit(['add', '--', ...pathsToStage], root);
     if (addRes.code !== 0) {
-      vscode.window.showErrorMessage(`GitSanity: Failed to stage files: ${addRes.stderr}`);
+      vscode.window.showErrorMessage(`GitSanity: Failed to stage files: ${redact(addRes.stderr)}`);
       return;
     }
 
@@ -175,7 +175,7 @@ export async function safeCommitCommand(
 
       const switchRes = await runGit(['switch', '-c', newBranchName.trim()], root);
       if (switchRes.code !== 0) {
-        vscode.window.showErrorMessage(`GitSanity: Failed to create branch: ${switchRes.stderr}`);
+        vscode.window.showErrorMessage(`GitSanity: Failed to create branch: ${redact(switchRes.stderr)}`);
         return;
       }
     }

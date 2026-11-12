@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { runGit } from './gitRunner';
+import { redact } from './redact';
 import { detectStacks, buildGitignore } from './gitignoreTemplate';
 import { addEnvToGitignore } from '../env/gitignoreFile';
 
@@ -40,7 +41,7 @@ export async function initRepo(folderPath: string, envFileName: string = '.env')
   if (initRes.code !== 0) {
     return {
       success: false,
-      error: initRes.stderr || 'git init failed',
+      error: redact(initRes.stderr) || 'git init failed',
       createdGitignore: false
     };
   }
