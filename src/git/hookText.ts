@@ -27,20 +27,21 @@ export function installHookBlock(existing: string | undefined): string {
     return `#!/bin/sh\n\n${HOOK_PAYLOAD.join('\n')}\n`;
   }
 
-  const eol = existing.includes('\r\n') ? '\r\n' : '\n';
-  const payloadStr = HOOK_PAYLOAD.join(eol);
+  // Shell scripts must always use LF (\n) line endings, even on Windows
+  const normalized = existing.replace(/\r\n/g, '\n');
+  const payloadStr = HOOK_PAYLOAD.join('\n');
 
   // If markers already exist, replace the block idempotently
-  if (isHookInstalled(existing)) {
-    const startIndex = existing.indexOf(HOOK_START_MARKER);
-    const endIndex = existing.indexOf(HOOK_END_MARKER) + HOOK_END_MARKER.length;
-    const before = existing.slice(0, startIndex);
-    const after = existing.slice(endIndex);
+  if (isHookInstalled(normalized)) {
+    const startIndex = normalized.indexOf(HOOK_START_MARKER);
+    const endIndex = normalized.indexOf(HOOK_END_MARKER) + HOOK_END_MARKER.length;
+    const before = normalized.slice(0, startIndex);
+    const after = normalized.slice(endIndex);
     return before + payloadStr + after;
   }
 
   // Check shebang compatibility
-  const firstLine = existing.split(/\r?\n/)[0].trim();
+  const firstLine = normalized.split('\n')[0].trim();
   if (firstLine.startsWith('#!')) {
     const isShOrBash =
       firstLine.includes('sh') ||
@@ -53,8 +54,8 @@ export function installHookBlock(existing: string | undefined): string {
     }
   }
 
-  const base = existing.endsWith('\n') ? existing : existing + eol;
-  return `${base}${eol}${payloadStr}${eol}`;
+  const base = normalized.endsWith('\n') ? normalized : normalized + '\n';
+  return `${base}\n${payloadStr}\n`;
 }
 
 /**
