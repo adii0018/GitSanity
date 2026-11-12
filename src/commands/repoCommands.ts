@@ -96,7 +96,7 @@ export async function createRepositoryCommand(
   if (commitRes.code === 0) {
     vscode.window.showInformationMessage('GitSanity: Created initial commit ("chore: initial commit").');
   } else {
-    vscode.window.showErrorMessage(`GitSanity: Initial commit failed: ${commitRes.stderr}`);
+    vscode.window.showErrorMessage(`GitSanity: Initial commit failed: ${redact(commitRes.stderr)}`);
   }
 }
 
@@ -108,6 +108,11 @@ export async function showHealthReportCommand(
   projectDiagnostics: vscode.DiagnosticCollection,
   targetFolder?: vscode.WorkspaceFolder
 ): Promise<void> {
+  if (!vscode.workspace.isTrusted) {
+    vscode.window.showErrorMessage('GitSanity: Git operations and health reports are disabled in untrusted workspaces.');
+    return;
+  }
+
   const folder = getActiveFolder(targetFolder);
   if (!folder) {
     vscode.window.showErrorMessage('GitSanity: No workspace folder open.');
