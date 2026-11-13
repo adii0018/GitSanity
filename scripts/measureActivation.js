@@ -26,12 +26,17 @@ const mockVscode = {
   },
   window: {
     createStatusBarItem: () => ({ show() {}, hide() {}, dispose() {} }),
-    createOutputChannel: () => ({ appendLine() {}, append() {}, dispose() {} })
+    createOutputChannel: () => ({ appendLine() {}, append() {}, dispose() {} }),
+    registerTreeDataProvider: () => ({ dispose() {} })
   },
   StatusBarAlignment: { Left: 1, Right: 2 },
   ExtensionMode: { Production: 1, Development: 2, Test: 3 },
   CodeActionKind: { QuickFix: { value: 'quickfix' } },
   CodeAction: class { constructor(title, kind) { this.title = title; this.kind = kind; } },
+  TreeItem: class { constructor(label) { this.label = label; } },
+  ThemeIcon: class { constructor(id) { this.id = id; } },
+  ThemeColor: class { constructor(id) { this.id = id; } },
+  TreeItemCollapsibleState: { None: 0, Collapsed: 1, Expanded: 2 },
   Range: class { constructor() {} },
   Position: class { constructor() {} },
   WorkspaceEdit: class { insert() {} delete() {} replace() {} },

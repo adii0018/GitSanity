@@ -57,6 +57,7 @@ This document tracks the completeness of every feature across all phases in GitS
 - [x] Dashboard webview with pure inline SVG bar charts and empty state (**DONE**)
 - [x] `old-todo` rule utilizing `git blame`, cached against mtime/HEAD, non-blocking while typing (**DONE**)
 - [x] `GitSanity: Find Old TODOs` command with interactive pick-to-navigate (**DONE**)
+- [x] Activity Bar Side Panel (`gitsanity-sidebar`) with live Status & Safety and Quick Actions tree views (**DONE**)
 
 ### Phase 7: Release Polish, Bundling & Packaging
 - [x] Esbuild bundler configuration for `out/extension.js` and `out/hook/pre-commit.bundle.js` (**DONE**)

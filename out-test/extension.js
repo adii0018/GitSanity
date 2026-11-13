@@ -46,6 +46,7 @@ const repoDetector_1 = require("./git/repoDetector");
 const hookInstaller_1 = require("./git/hookInstaller");
 const eventLog_1 = require("./stats/eventLog");
 const stats_1 = require("./stats/stats");
+const sidebar_1 = require("./ui/sidebar");
 function activate(context) {
     const startTime = Date.now();
     // 1. Output Channel & Separate Project DiagnosticCollection
@@ -220,8 +221,16 @@ function activate(context) {
         const { findOldTodosCommand } = await Promise.resolve().then(() => __importStar(require('./commands/todoCommands')));
         await findOldTodosCommand(configLoader);
     });
-    // 6. Register all disposables
-    context.subscriptions.push(outputChannel, projectDiagnostics, configLoader, diagnosticsManager, envWatcher, codeActionRegistration, statusBarItem, statusSubscription, createConfigCommand, rescanCommand, moveSecretCommand, moveAllSecretsCommand, addEnvToGitignoreCommand, menuCommand, createRepoCommand, scanProjCommand, clearProjCommand, healthReportCommand, scanHistoryCmd, publishToGitHubCmd, installHookCmd, uninstallHookCmd, safeCommitCmd, undoCommitCmd, reviewBeforeCommitCmd, showDashboardCmd, findOldTodosCmd);
+    // 6. Register Activity Bar Sidebar Tree Views
+    const statusTreeProvider = new sidebar_1.GitSanityStatusTreeProvider(diagnosticsManager);
+    const actionsTreeProvider = new sidebar_1.GitSanityActionsTreeProvider();
+    const statusTreeView = vscode.window.registerTreeDataProvider('gitsanity.status', statusTreeProvider);
+    const actionsTreeView = vscode.window.registerTreeDataProvider('gitsanity.actions', actionsTreeProvider);
+    const refreshStatusCmd = vscode.commands.registerCommand('gitsanity.refreshStatus', () => {
+        statusTreeProvider.refresh();
+    });
+    // 7. Register all disposables
+    context.subscriptions.push(outputChannel, projectDiagnostics, configLoader, diagnosticsManager, envWatcher, codeActionRegistration, statusBarItem, statusSubscription, statusTreeView, actionsTreeView, refreshStatusCmd, createConfigCommand, rescanCommand, moveSecretCommand, moveAllSecretsCommand, addEnvToGitignoreCommand, menuCommand, createRepoCommand, scanProjCommand, clearProjCommand, healthReportCommand, scanHistoryCmd, publishToGitHubCmd, installHookCmd, uninstallHookCmd, safeCommitCmd, undoCommitCmd, reviewBeforeCommitCmd, showDashboardCmd, findOldTodosCmd);
     // 7. On-open prompt (asynchronous, non-blocking)
     (0, repoPrompts_1.checkRepoPromptsOnOpen)(context);
     // 8. Debug activation measurement

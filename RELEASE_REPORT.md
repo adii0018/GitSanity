@@ -46,6 +46,7 @@
 | **Phase 6** | Dashboard webview with pure inline SVG charts & empty state | **DONE** | `src/ui/dashboard.ts`, `src/ui/dashboardHtml.ts` |
 | **Phase 6** | `old-todo` rule using `git blame`, cached against mtime/HEAD, non-blocking | **DONE** | `src/todo/blame.ts`, `src/todo/todoAge.ts`, `src/todo/todoFinder.ts` |
 | **Phase 6** | Find Old TODOs command with interactive pick-to-navigate | **DONE** | `src/commands/todoCommands.ts` |
+| **Phase 6** | Activity Bar Side Panel with live Status & Safety and Quick Actions | **DONE** | `src/ui/sidebar.ts`, `media/activitybar-icon.svg` |
 | **Phase 7** | Esbuild bundle for extension (`122.4 KB`) and hook (`34.1 KB`) | **DONE** | `package.json`, `esbuild` config |
 | **Phase 7** | Lazy module loading in `src/extension.ts` | **DONE** | `src/extension.ts` |
 | **Phase 7** | Marketplace metadata, preview flag, category/keyword tagging | **DONE** | `package.json` |

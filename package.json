@@ -27,7 +27,7 @@
   ],
   "icon": "media/icon.png",
   "galleryBanner": {
-    "color": "#0B1B2B",
+    "color": "#0B101D",
     "theme": "dark"
   },
   "extensionKind": [
@@ -147,8 +147,44 @@
         "command": "gitsanity.addEnvToGitignore",
         "title": "GitSanity: Add .env to .gitignore",
         "category": "GitSanity"
+      },
+      {
+        "command": "gitsanity.refreshStatus",
+        "title": "GitSanity: Refresh Status",
+        "category": "GitSanity",
+        "icon": "$(refresh)"
       }
     ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "gitsanity-sidebar",
+          "title": "GitSanity",
+          "icon": "media/activitybar-icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "gitsanity-sidebar": [
+        {
+          "id": "gitsanity.status",
+          "name": "Status & Safety"
+        },
+        {
+          "id": "gitsanity.actions",
+          "name": "Quick Actions"
+        }
+      ]
+    },
+    "menus": {
+      "view/title": [
+        {
+          "command": "gitsanity.refreshStatus",
+          "when": "view == gitsanity.status",
+          "group": "navigation"
+        }
+      ]
+    },
     "configuration": {
       "title": "GitSanity",
       "properties": {

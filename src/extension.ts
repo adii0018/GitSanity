@@ -9,6 +9,7 @@ import { detectRepoState } from './git/repoDetector';
 import { isGitSanityHookInstalled, resolveGitPaths } from './git/hookInstaller';
 import { getEventLogPath, readEvents } from './stats/eventLog';
 import { computeStreak } from './stats/stats';
+import { GitSanityStatusTreeProvider, GitSanityActionsTreeProvider } from './ui/sidebar';
 
 export function activate(context: vscode.ExtensionContext): void {
   const startTime = Date.now();
@@ -248,7 +249,17 @@ export function activate(context: vscode.ExtensionContext): void {
     await findOldTodosCommand(configLoader);
   });
 
-  // 6. Register all disposables
+  // 6. Register Activity Bar Sidebar Tree Views
+  const statusTreeProvider = new GitSanityStatusTreeProvider(diagnosticsManager);
+  const actionsTreeProvider = new GitSanityActionsTreeProvider();
+  const statusTreeView = vscode.window.registerTreeDataProvider('gitsanity.status', statusTreeProvider);
+  const actionsTreeView = vscode.window.registerTreeDataProvider('gitsanity.actions', actionsTreeProvider);
+
+  const refreshStatusCmd = vscode.commands.registerCommand('gitsanity.refreshStatus', () => {
+    statusTreeProvider.refresh();
+  });
+
+  // 7. Register all disposables
   context.subscriptions.push(
     outputChannel,
     projectDiagnostics,
@@ -258,6 +269,9 @@ export function activate(context: vscode.ExtensionContext): void {
     codeActionRegistration,
     statusBarItem,
     statusSubscription,
+    statusTreeView,
+    actionsTreeView,
+    refreshStatusCmd,
     createConfigCommand,
     rescanCommand,
     moveSecretCommand,

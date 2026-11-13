@@ -1,7 +1,7 @@
 **
 !out/extension.js
 !out/hook/pre-commit.bundle.js
-!media/icon.png
+!media/**
 !schemas/**
 !README.md
 !CHANGELOG.md
