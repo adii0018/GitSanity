@@ -9,10 +9,10 @@ This guide outlines the step-by-step process for publishing GitSanity to the Vis
 Before packaging and publishing, update the following placeholders across the project:
 
 1. **`package.json`**:
-   - `"publisher"`: Change `"your-publisher-id"` to your verified VS Code Marketplace publisher identifier.
-   - `"repository"`: Replace `"https://github.com/<your-username>/gitsanity"` with your repository URL.
-   - `"bugs"`: Replace `"https://github.com/<your-username>/gitsanity/issues"` with your issues URL.
-   - `"homepage"`: Replace `"https://github.com/<your-username>/gitsanity#readme"` with your project homepage or repository README URL.
+   - `"publisher"`: Set to verified VS Code Marketplace identifier (`adii0018`).
+   - `"repository"`: Set to `https://github.com/adii0018/GitSanity`.
+   - `"bugs"`: Set to `https://github.com/adii0018/GitSanity/issues`.
+   - `"homepage"`: Set to `https://github.com/adii0018/GitSanity#readme`.
 2. **`LICENSE`**:
    - Replace `<Your Name>` with your legal or professional copyright name.
 
@@ -68,7 +68,7 @@ Before publishing, verify the following in a fresh environment:
 ### Step 4.1: Authenticate with `vsce`
 Run the login command in your terminal:
 ```bash
-npx vsce login <your-publisher-id>
+npx vsce login adii0018
 ```
 Paste your Personal Access Token when prompted.
 

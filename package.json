@@ -4,7 +4,7 @@
   "description": "Scan, secure and commit safely",
   "version": "0.1.0",
   "preview": true,
-  "publisher": "your-publisher-id",
+  "publisher": "adii0018",
   "license": "MIT",
   "engines": {
     "vscode": "^1.80.0"
@@ -35,12 +35,12 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/<your-username>/gitsanity"
+    "url": "https://github.com/adii0018/GitSanity"
   },
   "bugs": {
-    "url": "https://github.com/<your-username>/gitsanity/issues"
+    "url": "https://github.com/adii0018/GitSanity/issues"
   },
-  "homepage": "https://github.com/<your-username>/gitsanity#readme",
+  "homepage": "https://github.com/adii0018/GitSanity#readme",
   "activationEvents": [
     "onStartupFinished"
   ],

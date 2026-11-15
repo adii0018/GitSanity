@@ -156,7 +156,7 @@ The codebase is clean, robust, thoroughly tested (all 8 test suites pass), depen
 ## 7. Placeholders to Replace
 
 1. **`package.json`**:
-   - `"publisher": "your-publisher-id"` -> Replace with your registered VS Code Marketplace publisher ID.
+   - `"publisher": "adii0018"` -> Registered VS Code Marketplace publisher ID.
    - `"repository": { "url": "https://github.com/<your-username>/gitsanity" }` -> Replace with your GitHub repository URL.
    - `"bugs": { "url": "https://github.com/<your-username>/gitsanity/issues" }` -> Replace with your issues URL.
    - `"homepage": "https://github.com/<your-username>/gitsanity#readme"` -> Replace with your project homepage.
@@ -204,6 +204,6 @@ The codebase is clean, robust, thoroughly tested (all 8 test suites pass), depen
 
 Follow the detailed instructions in [`docs/PUBLISHING.md`](file:///c:/Users/opg21/OneDrive/Desktop/GitSanity/docs/PUBLISHING.md):
 1. Log in to [Azure DevOps](https://dev.azure.com/) and generate a Personal Access Token (PAT) with `Marketplace (Manage)` scope.
-2. Replace `"publisher"` in `package.json` with your publisher identifier.
-3. Run `npx vsce login <your-publisher-id>`.
+2. `"publisher"` in `package.json` set to `"adii0018"`.
+3. Run `npx vsce login adii0018`.
 4. Run `npx vsce publish`.
