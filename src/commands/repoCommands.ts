@@ -286,21 +286,41 @@ export async function publishToGitHubCommand(
   const repoState = await detectRepoState(root);
 
   if (repoState.state === 'no-repo' || repoState.state === 'no-git') {
-    const choice = await vscode.window.showWarningMessage(
-      'No Git repository found in this folder. Create one first?',
-      'Create Repository'
+    const choice = await vscode.window.showInformationMessage(
+      `'${folder.name}' is not a Git repository yet. Initialize Git and publish to GitHub?`,
+      { modal: true },
+      'Initialize & Publish',
+      'Cancel'
     );
-    if (choice === 'Create Repository') {
-      await vscode.commands.executeCommand('gitsanity.createRepository', folder);
-    }
-    return;
-  }
+    if (choice !== 'Initialize & Publish') return;
 
-  if (!repoState.hasCommits) {
-    vscode.window.showErrorMessage(
-      'GitSanity: Repository has no commits yet. Make at least one commit before publishing to GitHub.'
+    const config = configLoader.getConfigFor(folder.uri);
+    const initRes = await initRepo(root, config.envFile || '.env');
+    if (!initRes.success) {
+      vscode.window.showErrorMessage(`GitSanity: ${initRes.error || 'Failed to initialize Git repository.'}`);
+      return;
+    }
+
+    // Add all files and make initial commit
+    await runGit(['add', '-A'], root);
+    const commitRes = await runGit(['commit', '-m', 'chore: initial commit'], root);
+    if (commitRes.code !== 0) {
+      await runGit(['commit', '--allow-empty', '-m', 'chore: initial commit'], root);
+    }
+  } else if (!repoState.hasCommits) {
+    const commitChoice = await vscode.window.showInformationMessage(
+      `Repository in '${folder.name}' has no commits yet. Create initial commit and publish?`,
+      { modal: true },
+      'Commit & Publish',
+      'Cancel'
     );
-    return;
+    if (commitChoice !== 'Commit & Publish') return;
+
+    await runGit(['add', '-A'], root);
+    const commitRes = await runGit(['commit', '-m', 'chore: initial commit'], root);
+    if (commitRes.code !== 0) {
+      await runGit(['commit', '--allow-empty', '-m', 'chore: initial commit'], root);
+    }
   }
 
   // Check if remote 'origin' already exists
@@ -385,6 +405,9 @@ export async function publishToGitHubCommand(
     vscode.window.showErrorMessage(`GitSanity: Failed to add remote origin: ${redact(remoteRes.stderr)}`);
     return;
   }
+
+  vscode.commands.executeCommand('gitsanity.refreshStatus');
+  vscode.commands.executeCommand('gitsanity.refreshGraph');
 
   // Ask to push now
   const pushChoice = await vscode.window.showInformationMessage(

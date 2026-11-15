@@ -2,7 +2,7 @@
   "name": "gitsanity",
   "displayName": "GitSanity",
   "description": "Scan, secure and commit safely",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "preview": true,
   "publisher": "adii0018",
   "license": "MIT",
@@ -153,6 +153,17 @@
         "title": "GitSanity: Refresh Status",
         "category": "GitSanity",
         "icon": "$(refresh)"
+      },
+      {
+        "command": "gitsanity.refreshGraph",
+        "title": "GitSanity: Refresh Commit Graph",
+        "category": "GitSanity",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "gitsanity.showCommitActions",
+        "title": "GitSanity: Show Commit Actions",
+        "category": "GitSanity"
       }
     ],
     "viewsContainers": {
@@ -171,6 +182,10 @@
           "name": "Status & Safety"
         },
         {
+          "id": "gitsanity.graph",
+          "name": "Commit Graph"
+        },
+        {
           "id": "gitsanity.actions",
           "name": "Quick Actions"
         }
@@ -181,6 +196,11 @@
         {
           "command": "gitsanity.refreshStatus",
           "when": "view == gitsanity.status",
+          "group": "navigation"
+        },
+        {
+          "command": "gitsanity.refreshGraph",
+          "when": "view == gitsanity.graph",
           "group": "navigation"
         }
       ]

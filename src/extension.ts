@@ -9,7 +9,8 @@ import { detectRepoState } from './git/repoDetector';
 import { isGitSanityHookInstalled, resolveGitPaths } from './git/hookInstaller';
 import { getEventLogPath, readEvents } from './stats/eventLog';
 import { computeStreak } from './stats/stats';
-import { GitSanityStatusTreeProvider, GitSanityActionsTreeProvider } from './ui/sidebar';
+import { GitSanityStatusTreeProvider, GitSanityActionsTreeProvider, GitSanityGraphTreeProvider } from './ui/sidebar';
+import { showCommitActionsCommand } from './commands/commitActions';
 
 export function activate(context: vscode.ExtensionContext): void {
   const startTime = Date.now();
@@ -251,13 +252,26 @@ export function activate(context: vscode.ExtensionContext): void {
 
   // 6. Register Activity Bar Sidebar Tree Views
   const statusTreeProvider = new GitSanityStatusTreeProvider(diagnosticsManager);
+  const graphTreeProvider = new GitSanityGraphTreeProvider();
   const actionsTreeProvider = new GitSanityActionsTreeProvider();
   const statusTreeView = vscode.window.registerTreeDataProvider('gitsanity.status', statusTreeProvider);
+  const graphTreeView = vscode.window.registerTreeDataProvider('gitsanity.graph', graphTreeProvider);
   const actionsTreeView = vscode.window.registerTreeDataProvider('gitsanity.actions', actionsTreeProvider);
 
   const refreshStatusCmd = vscode.commands.registerCommand('gitsanity.refreshStatus', () => {
     statusTreeProvider.refresh();
   });
+
+  const refreshGraphCmd = vscode.commands.registerCommand('gitsanity.refreshGraph', () => {
+    graphTreeProvider.refresh();
+  });
+
+  const showCommitActionsCmd = vscode.commands.registerCommand(
+    'gitsanity.showCommitActions',
+    async (commit: any) => {
+      await showCommitActionsCommand(commit, configLoader, outputChannel);
+    }
+  );
 
   // 7. Register all disposables
   context.subscriptions.push(
@@ -270,8 +284,11 @@ export function activate(context: vscode.ExtensionContext): void {
     statusBarItem,
     statusSubscription,
     statusTreeView,
+    graphTreeView,
     actionsTreeView,
     refreshStatusCmd,
+    refreshGraphCmd,
+    showCommitActionsCmd,
     createConfigCommand,
     rescanCommand,
     moveSecretCommand,

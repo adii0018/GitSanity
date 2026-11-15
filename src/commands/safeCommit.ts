@@ -181,17 +181,53 @@ export async function safeCommitCommand(
     }
   }
 
-  // 6. Commit message suggestion
+  // 6. Conventional commit type selection
+  const commitTypes = [
+    { label: '✨ feat', description: 'A new feature', prefix: 'feat' },
+    { label: '🐛 fix', description: 'A bug fix', prefix: 'fix' },
+    { label: '📝 docs', description: 'Documentation changes', prefix: 'docs' },
+    { label: '♻️ refactor', description: 'Code refactoring without new features/bugs', prefix: 'refactor' },
+    { label: '⚡ perf', description: 'Performance improvement', prefix: 'perf' },
+    { label: '💄 style', description: 'Code style / formatting', prefix: 'style' },
+    { label: '🧪 test', description: 'Adding or updating tests', prefix: 'test' },
+    { label: '🔧 chore', description: 'Maintenance, dependencies, auxiliary tools', prefix: 'chore' },
+    { label: '✏️ custom', description: 'Enter full custom commit message', prefix: '' }
+  ];
+
+  const pickedType = await vscode.window.showQuickPick(commitTypes, {
+    placeHolder: 'Select commit type (Conventional Commits):'
+  });
+  if (!pickedType) return;
+
   const suggestedMsg = buildCommitMessage(staged);
+  let prefill = '';
+  if (pickedType.prefix) {
+    const colonIdx = suggestedMsg.indexOf(': ');
+    const descOnly = colonIdx !== -1 ? suggestedMsg.slice(colonIdx + 2) : suggestedMsg;
+    prefill = `${pickedType.prefix}: ${descOnly}`;
+  } else {
+    prefill = suggestedMsg;
+  }
+
   const userMsg = await vscode.window.showInputBox({
     prompt: 'Enter commit message:',
-    value: suggestedMsg,
+    value: prefill,
     validateInput: (val) => (!val || !val.trim() ? 'Commit message cannot be empty.' : null)
   });
 
   if (!userMsg || !userMsg.trim()) {
     return;
   }
+
+  // Choose commit mode: Commit & Push vs Commit Locally
+  const commitAction = await vscode.window.showQuickPick(
+    [
+      { label: '🚀 Commit & Push', description: 'Commit staged changes and immediately push to remote', mode: 'push' },
+      { label: '💾 Commit Locally', description: 'Record commit without pushing to remote', mode: 'local' }
+    ],
+    { placeHolder: 'Choose commit action:' }
+  );
+  if (!commitAction) return;
 
   // 7. Verify user.name / user.email
   if (!repoState.userConfigured) {
@@ -215,6 +251,44 @@ export async function safeCommitCommand(
 
   await logSafeCommitStatsIfNeeded(root, 'commit', repoState.branch, scanRes.staged.length, [], warnings);
   const shortHash = commitRes.shortHash || 'HEAD';
+
+  // Refresh status and commit graph in sidebar
+  vscode.commands.executeCommand('gitsanity.refreshStatus');
+  vscode.commands.executeCommand('gitsanity.refreshGraph');
+
+  if (commitAction.mode === 'push') {
+    const currentRepoState = await detectRepoState(root);
+    if (currentRepoState.remotes.length === 0) {
+      const pubChoice = await vscode.window.showInformationMessage(
+        `GitSanity: Committed ${shortHash}. No remote configured. Publish to GitHub now?`,
+        'Publish to GitHub',
+        'Not now'
+      );
+      if (pubChoice === 'Publish to GitHub') {
+        vscode.commands.executeCommand('gitsanity.publishToGitHub', targetFolder);
+      }
+      return;
+    }
+
+    const upstreamRes = await runGit(['rev-parse', '--abbrev-ref', '@{u}'], root);
+    const hasUpstream = upstreamRes.code === 0 && upstreamRes.stdout.trim().length > 0;
+
+    const pushArgs = hasUpstream ? ['push'] : ['push', '-u', 'origin', currentRepoState.branch || 'main'];
+    outputChannel.appendLine(`[push] git ${pushArgs.join(' ')}`);
+
+    const pushRes = await runGit(pushArgs, root);
+    if (pushRes.code !== 0) {
+      outputChannel.appendLine(`[push-error] ${redact(pushRes.stderr)}`);
+      vscode.window.showErrorMessage(`GitSanity: Push failed: ${redact(pushRes.stderr.split('\n')[0])}`);
+    } else {
+      vscode.window.showInformationMessage(
+        `GitSanity: Committed ${shortHash} and successfully pushed to ${currentRepoState.remotes[0].name}! 🚀`
+      );
+      vscode.commands.executeCommand('gitsanity.refreshStatus');
+      vscode.commands.executeCommand('gitsanity.refreshGraph');
+    }
+    return;
+  }
 
   const actionChoice = await vscode.window.showInformationMessage(
     `GitSanity: Committed ${shortHash}`,
@@ -243,6 +317,8 @@ export async function safeCommitCommand(
       vscode.window.showErrorMessage(`GitSanity: Push failed: ${redact(pushRes.stderr.split('\n')[0])}`);
     } else {
       vscode.window.showInformationMessage(`GitSanity: Successfully pushed to ${currentRepoState.remotes[0].name}.`);
+      vscode.commands.executeCommand('gitsanity.refreshStatus');
+      vscode.commands.executeCommand('gitsanity.refreshGraph');
     }
   }
 }
