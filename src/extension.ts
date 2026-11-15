@@ -273,6 +273,14 @@ export function activate(context: vscode.ExtensionContext): void {
     }
   );
 
+  const switchBranchCmd = vscode.commands.registerCommand(
+    'gitsanity.switchBranch',
+    async (folder?: vscode.WorkspaceFolder) => {
+      const { switchBranchCommand } = await import('./commands/branchCommands');
+      await switchBranchCommand(folder);
+    }
+  );
+
   // 7. Register all disposables
   context.subscriptions.push(
     outputChannel,
@@ -289,6 +297,7 @@ export function activate(context: vscode.ExtensionContext): void {
     refreshStatusCmd,
     refreshGraphCmd,
     showCommitActionsCmd,
+    switchBranchCmd,
     createConfigCommand,
     rescanCommand,
     moveSecretCommand,

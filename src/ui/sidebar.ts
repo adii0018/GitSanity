@@ -89,7 +89,11 @@ export class GitSanityStatusTreeProvider implements vscode.TreeDataProvider<vsco
       const branchItem = new vscode.TreeItem(`Branch: ${repoState.branch || 'detached'}`, vscode.TreeItemCollapsibleState.None);
       branchItem.description = `[${stagedCount} staged, ${unstagedCount} modified]`;
       branchItem.iconPath = new vscode.ThemeIcon('git-branch');
-      branchItem.tooltip = `Current Branch: ${repoState.branch}\nStaged files: ${stagedCount}\nUnstaged/untracked files: ${unstagedCount}`;
+      branchItem.tooltip = `Current Branch: ${repoState.branch}\nStaged files: ${stagedCount}\nUnstaged/untracked files: ${unstagedCount}\nClick to switch or create branch!`;
+      branchItem.command = {
+        command: 'gitsanity.switchBranch',
+        title: 'Switch or Create Branch'
+      };
       items.push(branchItem);
 
       // 3. GitHub Remote Connection Status
@@ -260,6 +264,13 @@ export class GitSanityActionsTreeProvider implements vscode.TreeDataProvider<vsc
       command: 'gitsanity.reviewBeforeCommit',
       description: '[Visual diff review]',
       tooltip: 'Open the staged changes review panel.'
+    },
+    {
+      label: 'Switch or Create Branch',
+      icon: 'git-branch',
+      command: 'gitsanity.switchBranch',
+      description: '[Switch / new branch]',
+      tooltip: 'Switch between existing branches or create a new branch with valid naming rules.'
     },
     {
       label: 'Publish to GitHub',

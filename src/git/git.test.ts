@@ -11,6 +11,7 @@ import { installHookBlock, removeHookBlock, isHookInstalled } from './hookText';
 import { parseStatusPorcelain } from './stagedFiles';
 import { buildCommitMessage } from './commitMessage';
 import { mapGitHubError, validateRepoName, createGitHubRepo } from './githubPublisher';
+import { validateBranchName } from './branchValidation';
 import { scanProject } from '../scanner/projectScanner';
 import { scanHistory } from './historyScanner';
 import { parseConfig, DEFAULT_CONFIG } from '../config/configSchema';
@@ -266,6 +267,24 @@ async function runTests(): Promise<void> {
     assert.ok(historyRes.findings[0].redactedPreview.includes('AKI***'));
   });
   console.log('✓ historyScanner integration passed');
+
+  // 11. validateBranchName unit tests
+  {
+    assert.strictEqual(validateBranchName('feature/my-branch'), undefined);
+    assert.strictEqual(validateBranchName('main'), undefined);
+    assert.strictEqual(validateBranchName('fix-123_test'), undefined);
+    assert.ok(validateBranchName('')?.includes('cannot be empty'));
+    assert.ok(validateBranchName('feat branch')?.includes('cannot contain spaces'));
+    assert.ok(validateBranchName('/starts-with-slash')?.includes('slash'));
+    assert.ok(validateBranchName('ends-with-slash/')?.includes('slash'));
+    assert.ok(validateBranchName('double..dot')?.includes('dots'));
+    assert.ok(validateBranchName('ref@{1}')?.includes('@{'));
+    assert.ok(validateBranchName('branch~1')?.includes('special characters'));
+    assert.ok(validateBranchName('branch^2')?.includes('special characters'));
+    assert.ok(validateBranchName('branch:test')?.includes('special characters'));
+    assert.ok(validateBranchName('branch.lock')?.includes('.lock'));
+  }
+  console.log('✓ validateBranchName passed');
 
   console.log('\nAll Git & Phase 4/5 integration tests passed successfully!');
 }

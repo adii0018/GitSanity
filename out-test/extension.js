@@ -238,8 +238,12 @@ function activate(context) {
     const showCommitActionsCmd = vscode.commands.registerCommand('gitsanity.showCommitActions', async (commit) => {
         await (0, commitActions_1.showCommitActionsCommand)(commit, configLoader, outputChannel);
     });
+    const switchBranchCmd = vscode.commands.registerCommand('gitsanity.switchBranch', async (folder) => {
+        const { switchBranchCommand } = await Promise.resolve().then(() => __importStar(require('./commands/branchCommands')));
+        await switchBranchCommand(folder);
+    });
     // 7. Register all disposables
-    context.subscriptions.push(outputChannel, projectDiagnostics, configLoader, diagnosticsManager, envWatcher, codeActionRegistration, statusBarItem, statusSubscription, statusTreeView, graphTreeView, actionsTreeView, refreshStatusCmd, refreshGraphCmd, showCommitActionsCmd, createConfigCommand, rescanCommand, moveSecretCommand, moveAllSecretsCommand, addEnvToGitignoreCommand, menuCommand, createRepoCommand, scanProjCommand, clearProjCommand, healthReportCommand, scanHistoryCmd, publishToGitHubCmd, installHookCmd, uninstallHookCmd, safeCommitCmd, undoCommitCmd, reviewBeforeCommitCmd, showDashboardCmd, findOldTodosCmd);
+    context.subscriptions.push(outputChannel, projectDiagnostics, configLoader, diagnosticsManager, envWatcher, codeActionRegistration, statusBarItem, statusSubscription, statusTreeView, graphTreeView, actionsTreeView, refreshStatusCmd, refreshGraphCmd, showCommitActionsCmd, switchBranchCmd, createConfigCommand, rescanCommand, moveSecretCommand, moveAllSecretsCommand, addEnvToGitignoreCommand, menuCommand, createRepoCommand, scanProjCommand, clearProjCommand, healthReportCommand, scanHistoryCmd, publishToGitHubCmd, installHookCmd, uninstallHookCmd, safeCommitCmd, undoCommitCmd, reviewBeforeCommitCmd, showDashboardCmd, findOldTodosCmd);
     // 7. On-open prompt (asynchronous, non-blocking)
     (0, repoPrompts_1.checkRepoPromptsOnOpen)(context);
     // 8. Debug activation measurement

@@ -164,6 +164,12 @@
         "command": "gitsanity.showCommitActions",
         "title": "GitSanity: Show Commit Actions",
         "category": "GitSanity"
+      },
+      {
+        "command": "gitsanity.switchBranch",
+        "title": "GitSanity: Switch or Create Branch",
+        "category": "GitSanity",
+        "icon": "$(git-branch)"
       }
     ],
     "viewsContainers": {

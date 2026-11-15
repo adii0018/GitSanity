@@ -46,6 +46,7 @@ const hookText_1 = require("./hookText");
 const stagedFiles_1 = require("./stagedFiles");
 const commitMessage_1 = require("./commitMessage");
 const githubPublisher_1 = require("./githubPublisher");
+const branchValidation_1 = require("./branchValidation");
 const projectScanner_1 = require("../scanner/projectScanner");
 const historyScanner_1 = require("./historyScanner");
 const configSchema_1 = require("../config/configSchema");
@@ -266,6 +267,23 @@ async function runTests() {
         assert.ok(historyRes.findings[0].redactedPreview.includes('AKI***'));
     });
     console.log('✓ historyScanner integration passed');
+    // 11. validateBranchName unit tests
+    {
+        assert.strictEqual((0, branchValidation_1.validateBranchName)('feature/my-branch'), undefined);
+        assert.strictEqual((0, branchValidation_1.validateBranchName)('main'), undefined);
+        assert.strictEqual((0, branchValidation_1.validateBranchName)('fix-123_test'), undefined);
+        assert.ok((0, branchValidation_1.validateBranchName)('')?.includes('cannot be empty'));
+        assert.ok((0, branchValidation_1.validateBranchName)('feat branch')?.includes('cannot contain spaces'));
+        assert.ok((0, branchValidation_1.validateBranchName)('/starts-with-slash')?.includes('slash'));
+        assert.ok((0, branchValidation_1.validateBranchName)('ends-with-slash/')?.includes('slash'));
+        assert.ok((0, branchValidation_1.validateBranchName)('double..dot')?.includes('dots'));
+        assert.ok((0, branchValidation_1.validateBranchName)('ref@{1}')?.includes('@{'));
+        assert.ok((0, branchValidation_1.validateBranchName)('branch~1')?.includes('special characters'));
+        assert.ok((0, branchValidation_1.validateBranchName)('branch^2')?.includes('special characters'));
+        assert.ok((0, branchValidation_1.validateBranchName)('branch:test')?.includes('special characters'));
+        assert.ok((0, branchValidation_1.validateBranchName)('branch.lock')?.includes('.lock'));
+    }
+    console.log('✓ validateBranchName passed');
     console.log('\nAll Git & Phase 4/5 integration tests passed successfully!');
 }
 runTests().catch((err) => {
