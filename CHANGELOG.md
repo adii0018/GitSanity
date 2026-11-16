@@ -2,6 +2,17 @@
 
 All notable changes to the "GitSanity" extension will be documented in this file.
 
+## [0.1.1] - (2026-11-16)
+
+### Added
+- **Visual Commit Graph View**: Dedicated interactive Git history tree in the Activity Bar sidebar with commit hashes, relative timestamps, author badges, and 1-click secret scanning of historical commits.
+- **Conventional Commit Selector**: Interactive picker for commit types (`feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `chore`, `custom`).
+- **1-Click "Commit & Push"**: Safe commit directly bundles pre-flight secret scans, conventional commit creation, and remote push in one action.
+- **Click-to-Switch & Create Branch**: Interactive branch switcher with real-time Git ref naming validation rules.
+- **1-Click GitHub Repository Creator**: Automatically initializes unlinked folders into GitHub repositories with starter `.gitignore`, initial commit, and remote push.
+- **Cyber Ninja Favicon**: High-resolution dark squircle neon green official icon.
+- **Sidebar Polish**: Added descriptive badges (`[Protected ✅]`, `[Connected ✅]`, `[Active ✅]`, `[X safe commits 🔥]`), removed deprecated buttons.
+
 ## [0.1.0] - Preview (2026-11-12)
 
 ### Initial Preview Release

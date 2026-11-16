@@ -1,83 +1,84 @@
 <div align="center">
 
-  <img src="media/icon.png" width="140" height="140" alt="GitSanity Logo" style="border-radius: 28px; box-shadow: 0 8px 24px rgba(0,0,0,0.5);" />
+  <img src="media/icon.png" width="130" height="130" alt="GitSanity Logo" style="border-radius: 26px; box-shadow: 0 10px 30px rgba(0, 255, 136, 0.2);" />
 
-  # GitSanity
-  
-  ### *Scan, secure, and commit safely.*
-  
-  **The zero-dependency developer guardrail that catches leaked secrets, forgotten logs, stray breakpoints, and merge conflicts before they enter your Git history.**
+  # GitSanity 🛡️
+
+  ### *Real-Time Security Guardrails & Safe Commits for VS Code*
+
+  **Catches leaked API keys, credentials, forgotten logs, debug breakpoints, and merge conflicts before they ever touch your Git history.**
 
   <p align="center">
-    <a href="#features"><img src="https://img.shields.io/badge/Status-Release%20Candidate%20(v0.1.0)-00f0ff?style=for-the-badge&logo=git&logoColor=black" alt="Version 0.1.0" /></a>
-    <a href="#license"><img src="https://img.shields.io/badge/License-MIT-emerald?style=for-the-badge" alt="MIT License" /></a>
-    <a href="https://code.visualstudio.com/"><img src="https://img.shields.io/badge/VS%20Code-^1.80.0-007acc?style=for-the-badge&logo=visualstudiocode&logoColor=white" alt="VS Code Version" /></a>
-    <a href="#privacy--security"><img src="https://img.shields.io/badge/Telemetry-Zero%20(100%25%20Local)-brightgreen?style=for-the-badge&logo=shield" alt="Zero Telemetry" /></a>
-    <a href="#architecture"><img src="https://img.shields.io/badge/Runtime%20Deps-0%20(Pure%20Node.js)-ff69b4?style=for-the-badge" alt="Zero Dependencies" /></a>
+    <a href="https://marketplace.visualstudio.com/items?itemName=adii0018.gitsanity"><img src="https://img.shields.io/badge/VS%20Code%20Marketplace-v0.1.1-007acc?style=for-the-badge&logo=visualstudiocode&logoColor=white" alt="Marketplace Version" /></a>
+    <a href="https://github.com/adii0018/GitSanity"><img src="https://img.shields.io/badge/GitHub-adii0018%2FGitSanity-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub Repo" /></a>
+    <a href="#license"><img src="https://img.shields.io/badge/License-MIT-00f0ff?style=for-the-badge" alt="MIT License" /></a>
+    <a href="#privacy--zero-telemetry"><img src="https://img.shields.io/badge/Telemetry-Zero%20(100%25%20Local)-2ea44f?style=for-the-badge&logo=shield" alt="Zero Telemetry" /></a>
+    <a href="#performance"><img src="https://img.shields.io/badge/Runtime%20Deps-0%20(Pure%20Node.js)-ff79c6?style=for-the-badge" alt="Zero Dependencies" /></a>
   </p>
 
   <p align="center">
-    <a href="#quick-start"><b>Quick Start</b></a> •
-    <a href="#key-features"><b>Key Features</b></a> •
-    <a href="#smart-auto-fix-move-to-env"><b>Move to .env</b></a> •
-    <a href="#pre-commit-hook--safe-commit"><b>Pre-Commit Hook</b></a> •
-    <a href="#activity-bar--sidebar"><b>Activity Bar</b></a> •
-    <a href="#configuration"><b>Configuration</b></a>
+    <a href="#-quick-start"><b>Quick Start</b></a> •
+    <a href="#-core-capabilities"><b>Features</b></a> •
+    <a href="#-visual-commit-graph--sidebar"><b>Commit Graph & Sidebar</b></a> •
+    <a href="#-smart-auto-fix-move-to-env"><b>Move to .env</b></a> •
+    <a href="#-safe-commit-flow"><b>Safe Commit</b></a> •
+    <a href="#-1-click-github-publishing"><b>GitHub Setup</b></a> •
+    <a href="#-configuration"><b>Config</b></a>
   </p>
 
 </div>
 
 ---
 
-## ⚡ Why GitSanity?
+## ⚡ The 3-Stage Safety Architecture
 
-Accidentally pushing an API key or an unverified commit can lead to compromised infrastructure, unexpected cloud bills, or broken main branches. 
-
-**GitSanity runs directly in your editor and your Git lifecycle to protect you at three critical stages:**
+Accidentally pushing a secret token or committing broken code to `main` can ruin your week. GitSanity embeds automated guardrails directly inside your development workflow:
 
 ```
-   [ Editor Typing ]   ──▶   [ Pre-Commit Hook ]   ──▶   [ Pre-Push / Publish ]
-    300ms Live Lint           Git Index Inspection          Full History Scan
-  (Squigglies & Fixes)      (Blocks Bad Commits)       (Finds Past Compromises)
+  ┌───────────────────────┐      ┌─────────────────────────┐      ┌────────────────────────┐
+  │   1. While You Code   │  ──▶ │   2. When You Commit    │  ──▶ │    3. When You Push    │
+  │   In-Editor Live Lint │      │   Pre-Commit Hook Blob  │      │    GitHub Publisher    │
+  │  (Secrets, Logs, Env) │      │  (Index-Accurate Check) │      │  (Whole-Repo Scan Gate)│
+  └───────────────────────┘      └─────────────────────────┘      └────────────────────────┘
 ```
 
-1. **While you write**: Instantly flags credentials, forgotten `console.log` statements, and breakpoint `debugger;` calls.
-2. **When you commit**: A bundled pre-commit hook verifies the **staged Git index** (`git show :path`), preventing commits containing `.env` files or secrets even if you bypass the editor.
-3. **When you review**: An interactive **Review Before Commit** panel with human checklists and streak tracking gives you peace of mind before shipping.
+1. **Typing in Editor**: Real-time 300ms debounced scanning flags tokens (`AKIA...`, Stripe, Bearer tokens), `console.log`, and `debugger;` calls with squiggly lines.
+2. **Git Commit Staging**: The pre-commit hook scans the **staged Git index** (`git show :path`), preventing `.env` leaks even if you commit from CLI or external terminals.
+3. **Repository Publishing**: 1-click GitHub publisher automates repository creation, `.gitignore` defense, and remote pushing with pre-flight secret audits.
 
 ---
 
-## 🚀 Key Features
+## 🚀 Core Capabilities
 
 <table>
   <tr>
     <td width="50%">
-      <h3>🪄 Move Secret to <code>.env</code></h3>
-      <p>Click the lightbulb on any hardcoded token. GitSanity automatically appends it to <code>.env</code>, registers a placeholder in <code>.env.example</code>, protects <code>.gitignore</code>, and updates your source code with native language expressions (JS/TS, Python, Go, Ruby, PHP, Java, C#, Shell).</p>
+      <h3>🌲 Visual Commit Graph</h3>
+      <p>Interactive Git history graph embedded directly in the GitSanity Activity Bar. Inspect past commits, view changed files, and run instant <b>Secret Scans</b> on any historical commit.</p>
     </td>
     <td width="50%">
-      <h3>🐾 Activity Bar Sidebar</h3>
-      <p>A native VS Code Activity Bar panel featuring live workspace safety health, active Git branch, pre-commit hook status, clean commit streak counter, and 1-click Quick Action triggers.</p>
+      <h3>🪄 1-Click "Move to <code>.env</code>"</h3>
+      <p>Press <kbd>Ctrl</kbd>+<kbd>.</kbd> on hardcoded keys. GitSanity migrates the token to <code>.env</code>, syncs <code>.env.example</code>, guards <code>.gitignore</code>, and inserts native language code automatically.</p>
     </td>
   </tr>
   <tr>
     <td width="50%">
-      <h3>🪝 Fail-Safe Pre-Commit Hook</h3>
-      <p>Standalone, zero-dependency Git hook that inspects the <b>Git index</b> directly. Preserves existing hooks via marker blocks, enforces LF line endings on Windows, and fails open if an internal error occurs.</p>
+      <h3>⚡ Conventional Safe Commit & Push</h3>
+      <p>Built-in Conventional Commit selector (<code>feat:</code>, <code>fix:</code>, <code>docs:</code>, <code>chore:</code>). Choose <b>1-Click Commit & Push</b> to bundle staging scan, commit, and remote synchronization together.</p>
     </td>
     <td width="50%">
-      <h3>🛡️ Safe Commit & Review Panel</h3>
-      <p>Interactive webview with automated Conventional Commit suggestions, protected branch warnings (<code>main</code>/<code>master</code>), and 1-click <b>Push</b> and <b>Undo Last Commit</b> safety controls.</p>
+      <h3>🌿 Click-to-Switch Branch</h3>
+      <p>Switch between local and remote branches in one click, or create new branches with automated <b>Git Ref rules validation</b> (blocking spaces, illegal characters, and ref collisions).</p>
     </td>
   </tr>
   <tr>
+    <td width="50%">
+      <h3>🌐 1-Click GitHub Repository Creator</h3>
+      <p>Open any folder in VS Code—even if uninitialized. GitSanity initializes Git, sets up <code>.gitignore</code>, makes an initial commit, creates a GitHub repo via OAuth, and pushes code instantly.</p>
+    </td>
     <td width="50%">
       <h3>📊 Streaks & Analytics Dashboard</h3>
-      <p>Gamified clean commit streak counter, unlockable milestones (7, 30, 100 clean commits), and pure inline SVG issue trend charts across the last 8 weeks.</p>
-    </td>
-    <td width="50%">
-      <h3>⏰ Old TODO Detector</h3>
-      <p>Uses <code>git blame</code> caching to surface stale <code>TODO</code>, <code>FIXME</code>, and <code>HACK</code> comments older than 90 days. Jump directly to forgotten technical debt in one click.</p>
+      <p>Gamified streak tracker rewarding clean commits, unlockable achievement milestones (7, 30, 100 clean commits), and pure inline SVG issue trend charts over the last 8 weeks.</p>
     </td>
   </tr>
 </table>
@@ -87,113 +88,123 @@ Accidentally pushing an API key or an unverified commit can lead to compromised 
 ## 🏃 Quick Start
 
 ### 1. Installation
-Install from the VS Code Marketplace or install the pre-packaged `.vsix`:
+
+Install directly from the VS Code Marketplace:
 ```bash
-code --install-extension gitsanity-0.1.0.vsix
+code --install-extension adii0018.gitsanity
 ```
+*Or search **`GitSanity`** in the Extensions sidebar (<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>X</kbd>).*
 
-### 2. Live Diagnostics
-Open any file and start typing. GitSanity flags security issues with zero configuration:
-- 🟡 **Yellow squiggly**: Warnings like forgotten `console.log(...)` or old TODOs.
-- 🔴 **Red squiggly**: Errors like AWS keys (`AKIA...`), generic secrets (`api_key = "..."`), merge conflict markers (`<<<<<<<`), or `debugger;`.
+---
 
-### 3. One-Click Fix
-Press <kbd>Ctrl</kbd>+<kbd>.</kbd> (or <kbd>Cmd</kbd>+<kbd>.</kbd> on macOS) on any flagged line:
-- **`GitSanity: Remove this console.log line`**: Deletes the debug statement instantly.
-- **`GitSanity: Move secret to .env`**: Migrates the secret out of your code and secures it in your environment.
+### 2. Live In-Editor Guardrails
 
-### 4. Activate Pre-Commit Protection
-Open the Command Palette (<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>) and run:
-```
-GitSanity: Install Pre-commit Hook
-```
-*Your local Git repository is now shielded against accidental secret leaks in both terminal and GUI commits!*
+Start typing in any source file. GitSanity automatically classifies issues:
+- 🔴 **Red Squiggly (Error)**: Cloud credentials, private keys, high-entropy tokens, Git merge conflict markers (`<<<<<<<`), or `debugger;` statements.
+- 🟡 **Yellow Squiggly (Warning)**: Stray `console.log(...)` statements, aged TODOs older than 90 days.
+
+---
+
+### 3. One-Click Quick Fixes
+
+Place your cursor on any flagged line and press <kbd>Ctrl</kbd>+<kbd>.</kbd> (or <kbd>Cmd</kbd>+<kbd>.</kbd> on macOS):
+- **`GitSanity: Move secret to .env`**: Auto-migrates the secret and secures your repository.
+- **`GitSanity: Remove this console.log line`**: Cleans up debug output instantly.
+- **`GitSanity: Add .env to .gitignore`**: Shields environment files from Git tracking.
 
 ---
 
 ## 🪄 Smart Auto-Fix: "Move to .env"
 
-Hardcoding credentials directly into source code is the #1 cause of repository secret leaks. GitSanity automates the migration in one keypress:
+Hardcoding credentials directly into source files is the leading cause of accidental token leaks. GitSanity makes migration seamless:
 
 ```diff
 - const stripeKey = "YOUR_STRIPE_SECRET_KEY";
 + const stripeKey = process.env.STRIPE_KEY;
 ```
 
-### What happens behind the scenes:
-1. **Name Transformation**: Converts variable names to uppercase snake_case (`stripeKey` ➔ `STRIPE_KEY`).
-2. **Collision Prevention**: If `STRIPE_KEY` already exists with a different value in `.env`, GitSanity automatically creates `STRIPE_KEY_2`.
-3. **`.env` Upsert**: Appends the key-value pair to `.env` while preserving the file's original line endings (`LF` vs `CRLF`).
-4. **`.env.example` Sync**: Appends `STRIPE_KEY=` without the secret value so your team knows what to configure.
-5. **`.gitignore` Defense**: Immediately verifies `.gitignore` and appends `.env` if not already ignored.
-6. **Disk-First Ordering**: Writes `.env` to disk **before** modifying your code buffer, ensuring no secret is lost.
+### What GitSanity Does Automatically:
+1. **Case Normalization**: Converts camelCase or kebab-case identifiers to uppercase `SNAKE_CASE` (`stripeKey` ➔ `STRIPE_KEY`).
+2. **Collision Guard**: If `STRIPE_KEY` already exists in `.env` with a different value, GitSanity safely increments (`STRIPE_KEY_2`).
+3. **`.env` Sync**: Appends key-value pair preserving the original line endings (`LF` vs `CRLF`).
+4. **`.env.example` Registration**: Appends `STRIPE_KEY=` with an empty placeholder so collaborators know what to configure.
+5. **`.gitignore` Defense**: Instantly ensures `.env` is listed in `.gitignore`.
+6. **Disk-First Safety**: Writes `.env` to disk **before** editing the active code buffer to prevent data loss.
 
-### Multi-Language Syntax Support:
+### Supported Language Syntaxes:
 
-| Language | Generated Code | Insertion Helper |
+| Language | Generated Expression | Extra Automation |
 |---|---|---|
-| **JavaScript / TypeScript** | `process.env.VARIABLE_NAME` | — |
+| **JavaScript / TypeScript** | `process.env.VARIABLE_NAME` | Native Node.js |
 | **Python** | `os.environ["VARIABLE_NAME"]` | Automatically inserts `import os` if missing |
-| **Go** | `os.Getenv("VARIABLE_NAME")` | Provides import hint for `"os"` |
-| **Ruby** | `ENV["VARIABLE_NAME"]` | Native ENV lookup |
-| **PHP** | `getenv('VARIABLE_NAME')` | Native getenv lookup |
+| **Go** | `os.Getenv("VARIABLE_NAME")` | Import hint provided for `"os"` |
+| **Ruby** | `ENV["VARIABLE_NAME"]` | Native Ruby ENV |
+| **PHP** | `getenv('VARIABLE_NAME')` | Native getenv function |
 | **Java** | `System.getenv("VARIABLE_NAME")` | Native System lookup |
-| **C#** | `Environment.GetEnvironmentVariable("VARIABLE_NAME")` | Native Environment lookup |
-| **Shell (bash/sh)** | `${VARIABLE_NAME}` | Native POSIX syntax |
+| **C#** | `Environment.GetEnvironmentVariable("VARIABLE_NAME")` | Native .NET Environment |
+| **Shell / Bash** | `${VARIABLE_NAME}` | POSIX parameter expansion |
 
 ---
 
-## 🐾 Activity Bar & Sidebar
+## 🐾 Visual Commit Graph & Sidebar
 
-GitSanity includes a dedicated **Activity Bar Sidebar** accessible via the Cat Paw icon in the left navigation rail:
+GitSanity features a dedicated Activity Bar view with live status monitors and quick controls:
 
 ```
-[Activity Bar]
+[GitSanity Sidebar]
 ├── 🛡️ Status & Safety
-│   ├── Safety: Clean (0 issues)  [or X errors, Y warnings]
-│   ├── Branch: main
-│   ├── Pre-commit Hook: Active
-│   └── Clean Streak: 5 clean commit(s)
+│   ├── Safety: Clean (0 issues)        [Protected ✅]
+│   ├── Branch: main                    [0 staged, 2 modified] ──▶ Click to switch/create branch!
+│   ├── GitHub: adii0018/GitSanity      [Connected ✅]
+│   ├── Pre-commit Hook: Active         [Protected ✅]
+│   └── Clean Streak: 5 commit(s)       [5 safe commits 🔥]
+│
+├── 🌲 Commit Graph
+│   ├── ● [HEAD -> main] chore: update official extension icon
+│   ├── ● [origin/main] feat: click-to-switch branch with git ref rules
+│   ├── ● feat: commit graph tree and conventional commit flow
+│   └── └─▶ Click any commit: [Scan Secrets] [Copy Hash] [View Diff] [GitHub]
+│
 └── ⚡ Quick Actions
-    ├── Safe Commit
-    ├── Review Before Commit
-    ├── Show Dashboard
-    ├── Health Report
-    ├── Scan Entire Project
-    ├── Scan Git Commit History
-    ├── Find Old TODOs
-    ├── Install Pre-commit Hook
-    └── Create Config File
+    ├── 🚀 Safe Commit                  [Pre-flight check + push]
+    ├── 📋 Review Before Commit         [Visual diff review]
+    ├── 🌿 Switch or Create Branch      [Switch / new branch]
+    ├── 🌐 Publish to GitHub            [1-Click repo creation & push]
+    ├── 📊 Show Dashboard               [Analytics & charts]
+    ├── 🩺 Health Report                [Diagnostic report]
+    ├── 🔍 Scan Entire Project          [Workspace secret audit]
+    ├── 📜 Scan Git Commit History      [Past commits audit]
+    ├── ⏳ Find Old TODOs               [Stale blame review]
+    └── 🪝 Install Pre-commit Hook      [Fail-safe git guard]
 ```
 
 ---
 
-## 🪝 Pre-Commit Hook & Safe Commit
+## 🪝 Fail-Safe Pre-Commit Hook
 
-### The Problem With Normal Hooks
-Many pre-commit hooks scan files in the working directory on disk. If a developer runs `git add .`, modifies a file to remove the secret, and runs `git commit`, the secret is still staged in the Git index!
+### Why GitSanity's Hook Is Superior
+Standard Git pre-commit hooks inspect files on your disk. If you stage a secret with `git add .`, delete the line on disk, and run `git commit`, the secret is still recorded in the Git index!
 
-### The GitSanity Solution
-GitSanity's hook executes `git show :<path>` directly against the **staged Git index blob**:
-- **Index-Accurate**: Scans what is *actually* being committed, not what is on disk.
-- **Staged `.env` Blocker**: Rejects commits containing `.env`, `.env.local`, `.env.production` (exempting `.env.example`).
-- **Large File Alert**: Warns if any staged file exceeds the size cap (default 5 MB).
-- **Non-Destructive**: Integrates into existing `.git/hooks/pre-commit` scripts using `# >>> GitSanity >>>` markers. Compatible with Husky and Lefthook.
+GitSanity inspects the **Git index blob directly** (`git show :<path>`):
+- **Index-Accurate**: Scans the precise snapshot being committed, not the uncommitted disk buffer.
+- **`.env` Blocker**: Rejects any attempt to commit `.env`, `.env.local`, or `.env.production` files.
+- **Large File Warning**: Alerts when staged files exceed your threshold (default: 5 MB).
+- **Non-Destructive Integration**: Uses `# >>> GitSanity >>>` markers to co-exist cleanly with Husky, Lefthook, and custom hook scripts. Enforces LF line endings for cross-platform reliability on Windows.
 
 ---
 
 ## ⚙️ Configuration (`.gitsanity.json`)
 
-Customize rules and tolerances by creating a `.gitsanity.json` file in your repository root, or run **`GitSanity: Create Config File`**:
+Configure rule tolerances by placing `.gitsanity.json` in your repository root:
 
 ```json
 {
   "$schema": "./schemas/gitsanity.schema.json",
   "rules": {
-    "console-log": "warn",
-    "debugger": "error",
-    "conflict-marker": "error",
     "secret": "error",
+    "conflict-marker": "error",
+    "debugger": "error",
+    "console-log": "warn",
     "high-entropy-string": "warn",
     "old-todo": "off"
   },
@@ -215,74 +226,73 @@ Customize rules and tolerances by creating a `.gitsanity.json` file in your repo
 }
 ```
 
-### Inline Ignore Directives
+### Inline Ignore Directives:
 
-Temporarily suppress warnings in code using inline comment directives in any programming language:
+Suppress warnings on specific lines using inline comments in any programming language:
 
 ```javascript
-// Suppress all rules on this line
+// Ignore all rules on this line
 console.log("Telemetry payload"); // gitsanity-ignore
 
-// Suppress only specific rules
-const tempKey = "TESTING_CREDENTIAL_12345"; // gitsanity-ignore secret, high-entropy-string
+// Ignore specific rules
+const testToken = "TESTING_TOKEN_12345"; // gitsanity-ignore secret, high-entropy-string
 
-// Suppress the next line
+// Ignore the next line
 // gitsanity-ignore-next-line
 debugger;
 
-// Suppress the entire file (place within first 10 lines)
+// Ignore the entire file (place within first 10 lines)
 // gitsanity-ignore-file
 ```
 
 ---
 
-## ⌨️ Command Palette Reference
+## ⌨️ Command Reference
 
-| Command | Title | Purpose |
+| Command | Title | Description |
 |---|---|---|
-| `gitsanity.menu` | **GitSanity: Show Menu** | Opens the interactive GitSanity QuickPick hub |
-| `gitsanity.safeCommit` | **GitSanity: Safe Commit** | Pre-flight index scan + Conventional Commit flow |
-| `gitsanity.reviewBeforeCommit` | **GitSanity: Review Before Commit** | Opens the visual staged changes review panel |
-| `gitsanity.showDashboard` | **GitSanity: Show Dashboard** | Opens the Analytics, Streaks & Chart webview |
-| `gitsanity.showHealthReport` | **GitSanity: Show Health Report** | Deep diagnostic report of the active repository |
-| `gitsanity.scanProject` | **GitSanity: Scan Project** | Scans all workspace files (respects Git ignores) |
-| `gitsanity.scanHistory` | **GitSanity: Scan Git History** | Streams `git log -p` diffs to unearth past leaks |
-| `gitsanity.findOldTodos` | **GitSanity: Find Old TODOs** | Evaluates commit dates via `git blame` for stale TODOs |
+| `gitsanity.menu` | **GitSanity: Show Menu** | Interactive QuickPick menu with all tools |
+| `gitsanity.safeCommit` | **GitSanity: Safe Commit** | Conventional Commit prompt + 1-Click push |
+| `gitsanity.switchBranch` | **GitSanity: Switch or Create Branch** | Interactive branch switcher & validator |
+| `gitsanity.publishToGitHub` | **GitSanity: Publish to GitHub** | 1-Click repository setup, OAuth sign-in & push |
+| `gitsanity.reviewBeforeCommit` | **GitSanity: Review Before Commit** | Visual webview panel for staged file inspection |
+| `gitsanity.showDashboard` | **GitSanity: Show Dashboard** | Analytics webview with streak stats & trend charts |
+| `gitsanity.showHealthReport` | **GitSanity: Show Health Report** | Deep diagnostic audit of the active repository |
+| `gitsanity.scanProject` | **GitSanity: Scan Project** | Whole-workspace scan respecting `.gitignore` |
+| `gitsanity.scanHistory` | **GitSanity: Scan Git History** | Streams `git log -p` diffs to detect historical leaks |
+| `gitsanity.findOldTodos` | **GitSanity: Find Old TODOs** | Surfaces aged TODO comments via `git blame` |
 | `gitsanity.installHook` | **GitSanity: Install Pre-commit Hook** | Installs fail-safe pre-commit hook into `.git/hooks` |
-| `gitsanity.uninstallHook` | **GitSanity: Uninstall Pre-commit Hook** | Cleanly removes the GitSanity hook block |
-| `gitsanity.undoLastCommit` | **GitSanity: Undo Last Commit** | Safe soft-reset (`HEAD~1`) keeping changes staged |
-| `gitsanity.publishToGitHub` | **GitSanity: Publish to GitHub** | Creates remote GitHub repository and pushes branch |
-| `gitsanity.createConfig` | **GitSanity: Create Config File** | Generates `.gitsanity.json` with schema validation |
-| `gitsanity.rescanOpenFiles` | **GitSanity: Rescan Open Files** | Forces immediate live re-scan across all open editors |
+| `gitsanity.undoLastCommit` | **GitSanity: Undo Last Commit** | Safe soft reset (`HEAD~1`) keeping changes staged |
+| `gitsanity.rescanOpenFiles` | **GitSanity: Rescan Open Files** | Forces immediate live re-scan of active editors |
 
 ---
 
-## 🔒 Privacy & Security First
+## 🔒 Privacy & Zero Telemetry
 
-- 💻 **100% Local Execution**: All scanning, regex evaluation, entropy computation, and Git operations execute entirely on your machine.
-- 🚫 **Zero Telemetry**: No tracking, no external pings, and no analytics collection.
-- 🙈 **Token Redaction**: Any token, credential, or URL info printed to output channels or notifications is strictly redacted (`AKIAIOSF...` ➔ `AKI***`).
-- 🛡️ **Workspace Trust**: In untrusted workspaces (Restricted Mode), all Git execution, hook installation, and CLI capabilities are disabled. Live in-editor text scanning continues safely.
-- 📦 **Zero Runtime Dependencies**: Packaged with pure TypeScript and Node.js built-ins. No external npm supply chain vulnerabilities.
+- 💻 **100% Local Execution**: All regex scans, entropy calculations, and Git interactions execute purely on your machine.
+- 🚫 **Zero Telemetry**: No tracking, analytics, or external pings.
+- 🙈 **Token Redaction**: Tokens and credentials printed to notifications or logs are strictly masked (`AKIAIOSF...` ➔ `AKI***`).
+- 🛡️ **Workspace Trust Compliant**: In untrusted workspaces, all Git CLI operations and hook execution are disabled while in-editor linter diagnostics remain safe.
+- 📦 **Zero Runtime Dependencies**: Built with pure Node.js and TypeScript. Zero third-party npm runtime dependencies.
 
 ---
 
-## ⏱️ Benchmark & Performance
+## ⚡ Performance Benchmarks
 
-Tested on a standard development machine:
-
-- ⚡ **Extension Activation**: **8 ms** (lazy-loaded modules).
-- ⚡ **50,000-Line File Scan**: **136 ms** (~367,000 lines/sec).
-- ⚡ **5 MB File Scan**: **398 ms** (~12.5 MB/sec).
-- ⚡ **20,000-File Project Scan**: **3.4 seconds** (~5,800 files/sec).
-- ⚡ **ReDoS Immunity**: 100 KB single-line adversarial payload finishes in **0 ms** (5,000-char scan cap).
+| Metric | Result | Throughput |
+|---|---|---|
+| **Extension Activation** | **8 ms** | Lazy-loaded on demand |
+| **50,000-Line File Scan** | **136 ms** | ~367,000 lines / sec |
+| **5 MB Large File Scan** | **398 ms** | ~12.5 MB / sec |
+| **20,000-File Workspace Audit** | **3.4 seconds** | ~5,800 files / sec |
+| **ReDoS Single-Line Cap** | **0 ms** | 5,000-character safety guard |
 
 ---
 
 ## 📄 License
 
-Distributed under the **MIT License** (2026). See [LICENSE](LICENSE) for full terms.
+Distributed under the **MIT License**. Copyright &copy; 2026 Aditya Singh Rajput.
 
 <div align="center">
-  <sub>Built with ❤️ and sanity for the global developer community.</sub>
+  <sub>Built with ❤️ and sanity for developers worldwide.</sub>
 </div>
