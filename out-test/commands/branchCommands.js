@@ -148,7 +148,7 @@ async function switchBranchCommand(targetFolder) {
             vscode.window.showErrorMessage(`GitSanity: Failed to create branch: ${(0, redact_1.redact)(createRes.stderr)}`);
             return;
         }
-        vscode.window.showInformationMessage(`GitSanity: Created and switched to branch '${trimmed}'! 🌿`);
+        vscode.window.showInformationMessage(`GitSanity: Created and switched to branch '${trimmed}'.`);
         vscode.commands.executeCommand('gitsanity.refreshStatus');
         vscode.commands.executeCommand('gitsanity.refreshGraph');
         return;
@@ -173,7 +173,7 @@ async function switchBranchCommand(targetFolder) {
             vscode.window.showErrorMessage(`GitSanity: Failed to switch branch: ${(0, redact_1.redact)(switchRes.stderr.split(/\r?\n/)[0])}`);
             return;
         }
-        vscode.window.showInformationMessage(`GitSanity: Switched to branch '${target}'. 🌿`);
+        vscode.window.showInformationMessage(`GitSanity: Switched to branch '${target}'.`);
         vscode.commands.executeCommand('gitsanity.refreshStatus');
         vscode.commands.executeCommand('gitsanity.refreshGraph');
     }

@@ -91,7 +91,7 @@ export function renderReviewHtml(model: ReviewViewModel, nonce: string): string 
   const branchWarningHtml =
     model.isMainOrMaster && model.warnOnMainBranch
       ? `<div class="banner banner-warn">
-          <span class="banner-icon">⚠️</span>
+          <span class="banner-icon">[!]</span>
           <div>
             <strong>Protected Branch Notice:</strong> You are preparing to commit directly to
             <code>${escapeHtml(model.branch)}</code>.
@@ -113,7 +113,7 @@ export function renderReviewHtml(model: ReviewViewModel, nonce: string): string 
 
   const findingsRows =
     model.findings.length === 0
-      ? `<div class="empty-state">✅ No issues detected in staged files. Ready for review!</div>`
+      ? `<div class="empty-state">No issues detected in staged files. Ready for review.</div>`
       : `<table class="data-table">
           <thead>
             <tr>
@@ -154,7 +154,7 @@ export function renderReviewHtml(model: ReviewViewModel, nonce: string): string 
 
   const blockBanner = model.blockReason
     ? `<div class="banner banner-error">
-        <span class="banner-icon">⛔</span>
+        <span class="banner-icon">[!]</span>
         <div><strong>Cannot Commit:</strong> ${escapeHtml(model.blockReason)}</div>
       </div>`
     : '';
@@ -310,7 +310,7 @@ export function renderReviewHtml(model: ReviewViewModel, nonce: string): string 
   <div class="header-bar">
     <div class="header-left">
       <h2>Review Before Commit</h2>
-      <span class="branch-pill">🌿 ${escapeHtml(model.branch)}</span>
+      <span class="branch-pill">branch: ${escapeHtml(model.branch)}</span>
     </div>
     <div class="btn-group">
       <button id="btn-refresh" class="btn btn-secondary">↻ Refresh</button>

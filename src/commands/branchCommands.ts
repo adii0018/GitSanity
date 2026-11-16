@@ -134,7 +134,7 @@ export async function switchBranchCommand(targetFolder?: vscode.WorkspaceFolder)
       return;
     }
 
-    vscode.window.showInformationMessage(`GitSanity: Created and switched to branch '${trimmed}'! 🌿`);
+    vscode.window.showInformationMessage(`GitSanity: Created and switched to branch '${trimmed}'.`);
     vscode.commands.executeCommand('gitsanity.refreshStatus');
     vscode.commands.executeCommand('gitsanity.refreshGraph');
     return;
@@ -166,7 +166,7 @@ export async function switchBranchCommand(targetFolder?: vscode.WorkspaceFolder)
       return;
     }
 
-    vscode.window.showInformationMessage(`GitSanity: Switched to branch '${target}'. 🌿`);
+    vscode.window.showInformationMessage(`GitSanity: Switched to branch '${target}'.`);
     vscode.commands.executeCommand('gitsanity.refreshStatus');
     vscode.commands.executeCommand('gitsanity.refreshGraph');
   }

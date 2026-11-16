@@ -183,15 +183,15 @@ export async function safeCommitCommand(
 
   // 6. Conventional commit type selection
   const commitTypes = [
-    { label: '✨ feat', description: 'A new feature', prefix: 'feat' },
-    { label: '🐛 fix', description: 'A bug fix', prefix: 'fix' },
-    { label: '📝 docs', description: 'Documentation changes', prefix: 'docs' },
-    { label: '♻️ refactor', description: 'Code refactoring without new features/bugs', prefix: 'refactor' },
-    { label: '⚡ perf', description: 'Performance improvement', prefix: 'perf' },
-    { label: '💄 style', description: 'Code style / formatting', prefix: 'style' },
-    { label: '🧪 test', description: 'Adding or updating tests', prefix: 'test' },
-    { label: '🔧 chore', description: 'Maintenance, dependencies, auxiliary tools', prefix: 'chore' },
-    { label: '✏️ custom', description: 'Enter full custom commit message', prefix: '' }
+    { label: '$(sparkle) feat', description: 'A new feature', prefix: 'feat' },
+    { label: '$(bug) fix', description: 'A bug fix', prefix: 'fix' },
+    { label: '$(book) docs', description: 'Documentation changes', prefix: 'docs' },
+    { label: '$(tools) refactor', description: 'Code refactoring without new features/bugs', prefix: 'refactor' },
+    { label: '$(zap) perf', description: 'Performance improvement', prefix: 'perf' },
+    { label: '$(paintcan) style', description: 'Code style / formatting', prefix: 'style' },
+    { label: '$(beaker) test', description: 'Adding or updating tests', prefix: 'test' },
+    { label: '$(wrench) chore', description: 'Maintenance, dependencies, auxiliary tools', prefix: 'chore' },
+    { label: '$(edit) custom', description: 'Enter full custom commit message', prefix: '' }
   ];
 
   const pickedType = await vscode.window.showQuickPick(commitTypes, {
@@ -222,8 +222,8 @@ export async function safeCommitCommand(
   // Choose commit mode: Commit & Push vs Commit Locally
   const commitAction = await vscode.window.showQuickPick(
     [
-      { label: '🚀 Commit & Push', description: 'Commit staged changes and immediately push to remote', mode: 'push' },
-      { label: '💾 Commit Locally', description: 'Record commit without pushing to remote', mode: 'local' }
+      { label: '$(cloud-upload) Commit & Push', description: 'Commit staged changes and immediately push to remote', mode: 'push' },
+      { label: '$(git-commit) Commit Locally', description: 'Record commit without pushing to remote', mode: 'local' }
     ],
     { placeHolder: 'Choose commit action:' }
   );
@@ -282,7 +282,7 @@ export async function safeCommitCommand(
       vscode.window.showErrorMessage(`GitSanity: Push failed: ${redact(pushRes.stderr.split('\n')[0])}`);
     } else {
       vscode.window.showInformationMessage(
-        `GitSanity: Committed ${shortHash} and successfully pushed to ${currentRepoState.remotes[0].name}! 🚀`
+        `GitSanity: Committed ${shortHash} and successfully pushed to ${currentRepoState.remotes[0].name}.`
       );
       vscode.commands.executeCommand('gitsanity.refreshStatus');
       vscode.commands.executeCommand('gitsanity.refreshGraph');

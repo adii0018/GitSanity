@@ -2,7 +2,7 @@
 
   <img src="media/icon.png" width="130" height="130" alt="GitSanity Logo" style="border-radius: 26px; box-shadow: 0 10px 30px rgba(0, 255, 136, 0.2);" />
 
-  # GitSanity 🛡️
+  # GitSanity
 
   ### *Real-Time Security Guardrails & Safe Commits for VS Code*
 
@@ -13,24 +13,24 @@
     <a href="https://github.com/adii0018/GitSanity"><img src="https://img.shields.io/badge/GitHub-adii0018%2FGitSanity-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub Repo" /></a>
     <a href="#license"><img src="https://img.shields.io/badge/License-MIT-00f0ff?style=for-the-badge" alt="MIT License" /></a>
     <a href="#privacy--zero-telemetry"><img src="https://img.shields.io/badge/Telemetry-Zero%20(100%25%20Local)-2ea44f?style=for-the-badge&logo=shield" alt="Zero Telemetry" /></a>
-    <a href="#performance"><img src="https://img.shields.io/badge/Runtime%20Deps-0%20(Pure%20Node.js)-ff79c6?style=for-the-badge" alt="Zero Dependencies" /></a>
+    <a href="#performance-benchmarks"><img src="https://img.shields.io/badge/Runtime%20Deps-0%20(Pure%20Node.js)-ff79c6?style=for-the-badge" alt="Zero Dependencies" /></a>
   </p>
 
   <p align="center">
-    <a href="#-quick-start"><b>Quick Start</b></a> •
-    <a href="#-core-capabilities"><b>Features</b></a> •
-    <a href="#-visual-commit-graph--sidebar"><b>Commit Graph & Sidebar</b></a> •
-    <a href="#-smart-auto-fix-move-to-env"><b>Move to .env</b></a> •
-    <a href="#-safe-commit-flow"><b>Safe Commit</b></a> •
-    <a href="#-1-click-github-publishing"><b>GitHub Setup</b></a> •
-    <a href="#-configuration"><b>Config</b></a>
+    <a href="#quick-start"><b>Quick Start</b></a> •
+    <a href="#core-capabilities"><b>Features</b></a> •
+    <a href="#visual-commit-graph--sidebar"><b>Commit Graph & Sidebar</b></a> •
+    <a href="#smart-auto-fix-move-to-env"><b>Move to .env</b></a> •
+    <a href="#safe-commit-flow"><b>Safe Commit</b></a> •
+    <a href="#1-click-github-publishing"><b>GitHub Setup</b></a> •
+    <a href="#configuration"><b>Configuration</b></a>
   </p>
 
 </div>
 
 ---
 
-## ⚡ The 3-Stage Safety Architecture
+## The 3-Stage Safety Architecture
 
 Accidentally pushing a secret token or committing broken code to `main` can ruin your week. GitSanity embeds automated guardrails directly inside your development workflow:
 
@@ -48,36 +48,36 @@ Accidentally pushing a secret token or committing broken code to `main` can ruin
 
 ---
 
-## 🚀 Core Capabilities
+## Core Capabilities
 
 <table>
   <tr>
     <td width="50%">
-      <h3>🌲 Visual Commit Graph</h3>
+      <h3>Visual Commit Graph</h3>
       <p>Interactive Git history graph embedded directly in the GitSanity Activity Bar. Inspect past commits, view changed files, and run instant <b>Secret Scans</b> on any historical commit.</p>
     </td>
     <td width="50%">
-      <h3>🪄 1-Click "Move to <code>.env</code>"</h3>
+      <h3>1-Click "Move to <code>.env</code>"</h3>
       <p>Press <kbd>Ctrl</kbd>+<kbd>.</kbd> on hardcoded keys. GitSanity migrates the token to <code>.env</code>, syncs <code>.env.example</code>, guards <code>.gitignore</code>, and inserts native language code automatically.</p>
     </td>
   </tr>
   <tr>
     <td width="50%">
-      <h3>⚡ Conventional Safe Commit & Push</h3>
+      <h3>Conventional Safe Commit & Push</h3>
       <p>Built-in Conventional Commit selector (<code>feat:</code>, <code>fix:</code>, <code>docs:</code>, <code>chore:</code>). Choose <b>1-Click Commit & Push</b> to bundle staging scan, commit, and remote synchronization together.</p>
     </td>
     <td width="50%">
-      <h3>🌿 Click-to-Switch Branch</h3>
+      <h3>Click-to-Switch Branch</h3>
       <p>Switch between local and remote branches in one click, or create new branches with automated <b>Git Ref rules validation</b> (blocking spaces, illegal characters, and ref collisions).</p>
     </td>
   </tr>
   <tr>
     <td width="50%">
-      <h3>🌐 1-Click GitHub Repository Creator</h3>
+      <h3>1-Click GitHub Repository Creator</h3>
       <p>Open any folder in VS Code—even if uninitialized. GitSanity initializes Git, sets up <code>.gitignore</code>, makes an initial commit, creates a GitHub repo via OAuth, and pushes code instantly.</p>
     </td>
     <td width="50%">
-      <h3>📊 Streaks & Analytics Dashboard</h3>
+      <h3>Streaks & Analytics Dashboard</h3>
       <p>Gamified streak tracker rewarding clean commits, unlockable achievement milestones (7, 30, 100 clean commits), and pure inline SVG issue trend charts over the last 8 weeks.</p>
     </td>
   </tr>
@@ -85,7 +85,7 @@ Accidentally pushing a secret token or committing broken code to `main` can ruin
 
 ---
 
-## 🏃 Quick Start
+## Quick Start
 
 ### 1. Installation
 
@@ -100,8 +100,8 @@ code --install-extension adii0018.gitsanity
 ### 2. Live In-Editor Guardrails
 
 Start typing in any source file. GitSanity automatically classifies issues:
-- 🔴 **Red Squiggly (Error)**: Cloud credentials, private keys, high-entropy tokens, Git merge conflict markers (`<<<<<<<`), or `debugger;` statements.
-- 🟡 **Yellow Squiggly (Warning)**: Stray `console.log(...)` statements, aged TODOs older than 90 days.
+- **Red Squiggly (Error)**: Cloud credentials, private keys, high-entropy tokens, Git merge conflict markers (`<<<<<<<`), or `debugger;` statements.
+- **Yellow Squiggly (Warning)**: Stray `console.log(...)` statements, aged TODOs older than 90 days.
 
 ---
 
@@ -114,7 +114,7 @@ Place your cursor on any flagged line and press <kbd>Ctrl</kbd>+<kbd>.</kbd> (or
 
 ---
 
-## 🪄 Smart Auto-Fix: "Move to .env"
+## Smart Auto-Fix: "Move to .env"
 
 Hardcoding credentials directly into source files is the leading cause of accidental token leaks. GitSanity makes migration seamless:
 
@@ -124,7 +124,7 @@ Hardcoding credentials directly into source files is the leading cause of accide
 ```
 
 ### What GitSanity Does Automatically:
-1. **Case Normalization**: Converts camelCase or kebab-case identifiers to uppercase `SNAKE_CASE` (`stripeKey` ➔ `STRIPE_KEY`).
+1. **Case Normalization**: Converts camelCase or kebab-case identifiers to uppercase `SNAKE_CASE` (`stripeKey` -> `STRIPE_KEY`).
 2. **Collision Guard**: If `STRIPE_KEY` already exists in `.env` with a different value, GitSanity safely increments (`STRIPE_KEY_2`).
 3. **`.env` Sync**: Appends key-value pair preserving the original line endings (`LF` vs `CRLF`).
 4. **`.env.example` Registration**: Appends `STRIPE_KEY=` with an empty placeholder so collaborators know what to configure.
@@ -146,41 +146,41 @@ Hardcoding credentials directly into source files is the leading cause of accide
 
 ---
 
-## 🐾 Visual Commit Graph & Sidebar
+## Visual Commit Graph & Sidebar
 
 GitSanity features a dedicated Activity Bar view with live status monitors and quick controls:
 
 ```
 [GitSanity Sidebar]
-├── 🛡️ Status & Safety
-│   ├── Safety: Clean (0 issues)        [Protected ✅]
-│   ├── Branch: main                    [0 staged, 2 modified] ──▶ Click to switch/create branch!
-│   ├── GitHub: adii0018/GitSanity      [Connected ✅]
-│   ├── Pre-commit Hook: Active         [Protected ✅]
-│   └── Clean Streak: 5 commit(s)       [5 safe commits 🔥]
-│
-├── 🌲 Commit Graph
-│   ├── ● [HEAD -> main] chore: update official extension icon
-│   ├── ● [origin/main] feat: click-to-switch branch with git ref rules
-│   ├── ● feat: commit graph tree and conventional commit flow
-│   └── └─▶ Click any commit: [Scan Secrets] [Copy Hash] [View Diff] [GitHub]
-│
-└── ⚡ Quick Actions
-    ├── 🚀 Safe Commit                  [Pre-flight check + push]
-    ├── 📋 Review Before Commit         [Visual diff review]
-    ├── 🌿 Switch or Create Branch      [Switch / new branch]
-    ├── 🌐 Publish to GitHub            [1-Click repo creation & push]
-    ├── 📊 Show Dashboard               [Analytics & charts]
-    ├── 🩺 Health Report                [Diagnostic report]
-    ├── 🔍 Scan Entire Project          [Workspace secret audit]
-    ├── 📜 Scan Git Commit History      [Past commits audit]
-    ├── ⏳ Find Old TODOs               [Stale blame review]
-    └── 🪝 Install Pre-commit Hook      [Fail-safe git guard]
+|-- Status & Safety
+|   |-- Safety: Clean (0 issues)        [Protected]
+|   |-- Branch: main                    [0 staged, 2 modified] -> Click to switch/create branch
+|   |-- GitHub: adii0018/GitSanity      [Connected]
+|   |-- Pre-commit Hook: Active         [Active]
+|   `-- Clean Streak: 5 commit(s)       [5 safe commits]
+|
+|-- Commit Graph
+|   |-- [HEAD -> main] chore: update official extension icon
+|   |-- [origin/main] feat: click-to-switch branch with git ref rules
+|   |-- feat: commit graph tree and conventional commit flow
+|   `-- Click any commit: Scan Secrets | Copy Hash | View Diff | GitHub
+|
+`-- Quick Actions
+    |-- Safe Commit                     Pre-flight & push
+    |-- Review Before Commit            Staged review
+    |-- Switch or Create Branch         Branch manager
+    |-- Publish to GitHub               Publish repo
+    |-- Show Dashboard                  Analytics
+    |-- Health Report                   Diagnostics
+    |-- Scan Entire Project             Workspace scan
+    |-- Scan Git Commit History         History audit
+    |-- Find Old TODOs                  Blame review
+    `-- Install Pre-commit Hook         Git hook
 ```
 
 ---
 
-## 🪝 Fail-Safe Pre-Commit Hook
+## Fail-Safe Pre-Commit Hook
 
 ### Why GitSanity's Hook Is Superior
 Standard Git pre-commit hooks inspect files on your disk. If you stage a secret with `git add .`, delete the line on disk, and run `git commit`, the secret is still recorded in the Git index!
@@ -193,7 +193,7 @@ GitSanity inspects the **Git index blob directly** (`git show :<path>`):
 
 ---
 
-## ⚙️ Configuration (`.gitsanity.json`)
+## Configuration (`.gitsanity.json`)
 
 Configure rule tolerances by placing `.gitsanity.json` in your repository root:
 
@@ -247,7 +247,7 @@ debugger;
 
 ---
 
-## ⌨️ Command Reference
+## Command Reference
 
 | Command | Title | Description |
 |---|---|---|
@@ -267,17 +267,17 @@ debugger;
 
 ---
 
-## 🔒 Privacy & Zero Telemetry
+## Privacy & Zero Telemetry
 
-- 💻 **100% Local Execution**: All regex scans, entropy calculations, and Git interactions execute purely on your machine.
-- 🚫 **Zero Telemetry**: No tracking, analytics, or external pings.
-- 🙈 **Token Redaction**: Tokens and credentials printed to notifications or logs are strictly masked (`AKIAIOSF...` ➔ `AKI***`).
-- 🛡️ **Workspace Trust Compliant**: In untrusted workspaces, all Git CLI operations and hook execution are disabled while in-editor linter diagnostics remain safe.
-- 📦 **Zero Runtime Dependencies**: Built with pure Node.js and TypeScript. Zero third-party npm runtime dependencies.
+- **100% Local Execution**: All regex scans, entropy calculations, and Git interactions execute purely on your machine.
+- **Zero Telemetry**: No tracking, analytics, or external pings.
+- **Token Redaction**: Tokens and credentials printed to notifications or logs are strictly masked (`AKIAIOSF...` -> `AKI***`).
+- **Workspace Trust Compliant**: In untrusted workspaces, all Git CLI operations and hook execution are disabled while in-editor linter diagnostics remain safe.
+- **Zero Runtime Dependencies**: Built with pure Node.js and TypeScript. Zero third-party npm runtime dependencies.
 
 ---
 
-## ⚡ Performance Benchmarks
+## Performance Benchmarks
 
 | Metric | Result | Throughput |
 |---|---|---|
@@ -289,10 +289,10 @@ debugger;
 
 ---
 
-## 📄 License
+## License
 
-Distributed under the **MIT License**. Copyright &copy; 2026 Aditya Singh Rajput.
+Distributed under the **MIT License**. Copyright (c) 2026 Aditya Singh Rajput.
 
 <div align="center">
-  <sub>Built with ❤️ and sanity for developers worldwide.</sub>
+  <sub>Built with care and sanity for developers worldwide.</sub>
 </div>

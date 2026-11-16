@@ -39,11 +39,11 @@ export class GitSanityStatusTreeProvider implements vscode.TreeDataProvider<vsco
     // 1. Diagnostic Issues Count
     const counts = this.diagnosticsManager.getIssueCounts();
     let issueLabel = 'Safety: Clean (0 issues)';
-    let issueDesc = '[Protected ✅]';
+    let issueDesc = '[Protected]';
     let issueIcon = new vscode.ThemeIcon('shield', new vscode.ThemeColor('testing.iconPassed'));
     if (counts.errors > 0 || counts.warnings > 0) {
       issueLabel = `Safety: ${counts.errors} error(s), ${counts.warnings} warning(s)`;
-      issueDesc = counts.errors > 0 ? '[Critical Action Required 🛑]' : '[Warnings Present ⚠️]';
+      issueDesc = counts.errors > 0 ? '[Errors detected]' : '[Warnings detected]';
       issueIcon = new vscode.ThemeIcon(
         counts.errors > 0 ? 'error' : 'warning',
         new vscode.ThemeColor(counts.errors > 0 ? 'errorForeground' : 'editorWarning.foreground')
@@ -72,7 +72,7 @@ export class GitSanityStatusTreeProvider implements vscode.TreeDataProvider<vsco
       const repoState = await detectRepoState(root);
       if (repoState.state === 'no-repo' || repoState.state === 'no-git') {
         const noRepoItem = new vscode.TreeItem('Git: Not Initialized', vscode.TreeItemCollapsibleState.None);
-        noRepoItem.description = '[Click to Setup & Publish 🚀]';
+        noRepoItem.description = '[Click to Setup]';
         noRepoItem.iconPath = new vscode.ThemeIcon('repo-create', new vscode.ThemeColor('charts.orange'));
         noRepoItem.tooltip = 'This folder is not a Git repository. Click to initialize and publish to GitHub.';
         noRepoItem.command = { command: 'gitsanity.publishToGitHub', title: 'Publish to GitHub' };
@@ -105,7 +105,7 @@ export class GitSanityStatusTreeProvider implements vscode.TreeDataProvider<vsco
           repoNameDisplay = match[1];
         }
         const remoteItem = new vscode.TreeItem(`GitHub: ${repoNameDisplay}`, vscode.TreeItemCollapsibleState.None);
-        remoteItem.description = '[Connected ✅]';
+        remoteItem.description = '[Connected]';
         remoteItem.iconPath = new vscode.ThemeIcon('cloud');
         remoteItem.tooltip = `Connected to remote '${originRemote.name}'\nURL: ${originRemote.url}\nClick to open on GitHub.`;
         if (originRemote.url && originRemote.url.includes('github.com')) {
@@ -122,7 +122,7 @@ export class GitSanityStatusTreeProvider implements vscode.TreeDataProvider<vsco
         items.push(remoteItem);
       } else {
         const noRemoteItem = new vscode.TreeItem('GitHub: Not Connected', vscode.TreeItemCollapsibleState.None);
-        noRemoteItem.description = '[Click to Publish 🚀]';
+        noRemoteItem.description = '[Not connected]';
         noRemoteItem.iconPath = new vscode.ThemeIcon('cloud-upload', new vscode.ThemeColor('charts.orange'));
         noRemoteItem.tooltip = 'Repository is not published to GitHub. Click to create a GitHub repository and push code!';
         noRemoteItem.command = { command: 'gitsanity.publishToGitHub', title: 'Publish to GitHub' };
@@ -135,7 +135,7 @@ export class GitSanityStatusTreeProvider implements vscode.TreeDataProvider<vsco
         `Pre-commit Hook: ${hookActive ? 'Active' : 'Inactive'}`,
         vscode.TreeItemCollapsibleState.None
       );
-      hookItem.description = hookActive ? '[Active ✅]' : '[Click to Install 🪝]';
+      hookItem.description = hookActive ? '[Active]' : '[Click to Install]';
       hookItem.iconPath = hookActive
         ? new vscode.ThemeIcon('check', new vscode.ThemeColor('testing.iconPassed'))
         : new vscode.ThemeIcon('circle-slash', new vscode.ThemeColor('errorForeground'));
@@ -155,7 +155,7 @@ export class GitSanityStatusTreeProvider implements vscode.TreeDataProvider<vsco
           `Clean Streak: ${streak} commit(s)`,
           vscode.TreeItemCollapsibleState.None
         );
-        streakItem.description = streak > 0 ? `[${streak} safe commits 🔥]` : `[Start your streak! 🛡️]`;
+        streakItem.description = streak > 0 ? `[${streak} safe commits]` : '[0 safe commits]';
         streakItem.iconPath = new vscode.ThemeIcon('flame', new vscode.ThemeColor('charts.orange'));
         streakItem.tooltip = 'Number of consecutive safe commits with 0 errors.';
         items.push(streakItem);
@@ -255,70 +255,70 @@ export class GitSanityActionsTreeProvider implements vscode.TreeDataProvider<vsc
       label: 'Safe Commit',
       icon: 'git-commit',
       command: 'gitsanity.safeCommit',
-      description: '[Pre-flight check + push]',
+      description: 'Pre-flight & push',
       tooltip: 'Scan staged changes, choose commit type, and commit safely.'
     },
     {
       label: 'Review Before Commit',
       icon: 'checklist',
       command: 'gitsanity.reviewBeforeCommit',
-      description: '[Visual diff review]',
+      description: 'Staged review',
       tooltip: 'Open the staged changes review panel.'
     },
     {
       label: 'Switch or Create Branch',
       icon: 'git-branch',
       command: 'gitsanity.switchBranch',
-      description: '[Switch / new branch]',
+      description: 'Branch manager',
       tooltip: 'Switch between existing branches or create a new branch with valid naming rules.'
     },
     {
       label: 'Publish to GitHub',
       icon: 'cloud-upload',
       command: 'gitsanity.publishToGitHub',
-      description: '[1-Click repo creation & push]',
+      description: 'Publish repo',
       tooltip: 'Initialize and publish this folder to GitHub with secret scan protection.'
     },
     {
       label: 'Show Dashboard',
       icon: 'graph',
       command: 'gitsanity.showDashboard',
-      description: '[Analytics & charts]',
+      description: 'Analytics',
       tooltip: 'Open the GitSanity analytics dashboard with streaks and charts.'
     },
     {
       label: 'Health Report',
       icon: 'pulse',
       command: 'gitsanity.showHealthReport',
-      description: '[Diagnostic report]',
+      description: 'Diagnostics',
       tooltip: 'Run repository diagnostic health check.'
     },
     {
       label: 'Scan Entire Project',
       icon: 'search',
       command: 'gitsanity.scanProject',
-      description: '[Workspace secret audit]',
+      description: 'Workspace scan',
       tooltip: 'Scan all workspace files for secrets and issues.'
     },
     {
       label: 'Scan Git Commit History',
       icon: 'history',
       command: 'gitsanity.scanHistory',
-      description: '[Past commits audit]',
+      description: 'History audit',
       tooltip: 'Scan past commits for leaked secrets.'
     },
     {
       label: 'Find Old TODOs',
       icon: 'clock',
       command: 'gitsanity.findOldTodos',
-      description: '[Stale blame review]',
+      description: 'Blame review',
       tooltip: 'Search for aged TODO comments via git blame.'
     },
     {
       label: 'Install Pre-commit Hook',
       icon: 'plug',
       command: 'gitsanity.installHook',
-      description: '[Fail-safe git guard]',
+      description: 'Git hook',
       tooltip: 'Install or update the pre-commit hook.'
     }
   ];

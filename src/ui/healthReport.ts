@@ -173,7 +173,7 @@ export class HealthReportPanel {
               )
               .join('')}
           </ul>
-          <p class="warning-note">⚠️ Note: Deleting secrets from working files does not erase them from Git history. Rotate any exposed credentials immediately.</p>
+          <p class="warning-note">Note: Deleting secrets from working files does not erase them from Git history. Rotate any exposed credentials immediately.</p>
         `;
       }
     }
@@ -276,7 +276,7 @@ export class HealthReportPanel {
       <div class="count-box"><div class="count-num">${scanResult.countsBySeverity.warning}</div>Warnings</div>
       <div class="count-box"><div class="count-num">${totalIssues}</div>Total Issues</div>
     </div>
-    ${scanResult.capped ? '<p class="warning-note">⚠️ File limit reached: scan capped at maxProjectFiles limit.</p>' : ''}
+    ${scanResult.capped ? '<p class="warning-note">File limit reached: scan capped at maxProjectFiles limit.</p>' : ''}
   </div>
 
   <div class="card">

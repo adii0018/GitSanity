@@ -103,7 +103,7 @@ async function showCommitActionsCommand(commit, configLoader, outputChannel) {
                 }
             }
             else {
-                vscode.window.showInformationMessage(`GitSanity: Clean! No leaked secrets found in commit ${commit.shortHash}. ✅`);
+                vscode.window.showInformationMessage(`GitSanity: Clean! No leaked secrets found in commit ${commit.shortHash}.`);
             }
         });
     }

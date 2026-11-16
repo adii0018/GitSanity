@@ -145,7 +145,6 @@ export function renderDashboardHtml(model: DashboardViewModel, nonce: string): s
 </head>
 <body>
   <div class="empty-card">
-    <div class="icon">📊</div>
     <h2>No GitSanity Statistics Yet</h2>
     <p>Statistics and clean commit streaks begin recording automatically once you install the GitSanity pre-commit hook or use <strong>GitSanity: Safe Commit</strong>.</p>
     <button id="btn-install" class="btn">Install Git Hook</button>
@@ -179,7 +178,7 @@ export function renderDashboardHtml(model: DashboardViewModel, nonce: string): s
         <div class="badge-info">
           <div class="badge-title">${escapeHtml(m.title)}</div>
           <div class="badge-desc">${escapeHtml(m.desc)}</div>
-          <div class="badge-state">${isReached ? '🏆 Unlocked' : '🔒 Locked'}</div>
+          <div class="badge-state">${isReached ? 'Unlocked' : 'Locked'}</div>
         </div>
       </div>`;
     })
